@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cb643bb03ee82ca4586565893b59d0b8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - lightAttack_prefab: {fileID: 6759755800798216815, guid: 64e90ab1a448f6d49afdee392aaeb2af, type: 3}
+  - heavyAttack_prefab: {fileID: 1997468766629859393, guid: 6de3ec533884ff64ab3cfe5f8f5a5b98, type: 3}
+  - dashParticlePrefab: {fileID: 6496153390781297091, guid: c292088f1c076be44b9a9642ea4839b6, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
