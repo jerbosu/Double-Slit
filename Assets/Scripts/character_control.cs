@@ -372,7 +372,7 @@ public class character_movement : MonoBehaviour
     }
 
 
-    /* TODO:
+    /* COMMITED:
     + heavy attack spritesheet
         + heavy attack implementation
     + dash implementation
@@ -381,6 +381,17 @@ public class character_movement : MonoBehaviour
         + dash particle effect
     + redo squash/stretch to be max velocity (dash speed) based
     + fix physics engine (again)
+    */
+
+    /* TODO:
+    = hitboxes/hurtboxes
+        = player
+        = enemy (?)
+    = first enemy implementation
+        = sprite
+        = attack animation (?)
+        = ai????
+        = pathfinding (probably delay until i actually add a proper map)
     */
 
 
