@@ -400,8 +400,8 @@ public class character_movement : MonoBehaviour
     /* TODO:
     + heavy attack spritesheet
         + heavy attack implementation
-        = lower player alpha when heavy attack not available?
-        = particle effect when heavy attack becomes available?
+        + lower player alpha when heavy attack not available
+        + particle effect when heavy attack becomes available: player flashes
     + dash implementation
         + fix end of dash re-deceleration
         + dash input buffering
