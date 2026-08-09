@@ -122,6 +122,7 @@ public class character_movement : MonoBehaviour
 
         /* VISUALS OR SOMETHING */
         UpdateMoveParticles();
+
         if (Time.time - lasttime_heavyAttack >= cooldown_heavyAttack && heavyAttackAvailable == false)
         {
             heavyAttackAvailable = true;
@@ -340,11 +341,13 @@ public class character_movement : MonoBehaviour
     {
         heavyAttackAvailable = false;
         Quaternion aimAngleEuler;
+
         lasttime_heavyAttack = Time.time;
         Color c = sr.color;
         c.a = 0.5f; // change alpha of sprite since heavy attack just performed
         Debug.Log("Heavy attacked, alpha changed");
         sr.color = c;
+        bursts.Clear();
 
         // convert the screen pos (pixels) of the mouse to the world pos (coords)
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
@@ -354,6 +357,8 @@ public class character_movement : MonoBehaviour
         aimAngleEuler = Quaternion.Euler(0f, 0f, aimAngle);
 
         GameObject heavyAttack = Instantiate(heavyAttack_prefab, transform.position, aimAngleEuler);
+        SpriteRenderer heavyAttackSprite = heavyAttack.GetComponentInChildren<SpriteRenderer>();
+        //heavyAttackSprite.color = new Color32(236, 229, 62, 255);     // same yellow as sprite
         heavyAttack.transform.localScale = new Vector3(3f, 2f, 1f);
 
         body.linearVelocity = new Vector2(
