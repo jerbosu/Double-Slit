@@ -12,6 +12,7 @@ public class character_movement : MonoBehaviour
     private Rigidbody2D body;
     private Vector2 moveInput;
     private PlayerInputActions inputActions;
+    SpriteRenderer sr;
 
     [Header("Physics")]
     private const float ACCEL = 1f;        // how fast to speed up (directly adds to velocity so is smaller)
@@ -36,11 +37,13 @@ public class character_movement : MonoBehaviour
 
     [Header("Heavy Attack")]
     public GameObject heavyAttack_prefab;
-    private float cooldown_heavyAttack = 1f;                 // cooldown between heavy attacks
-    private float lasttime_heavyAttack = -Mathf.Infinity;    // last time player heavy attacked
-    private float bufferTimer_heavyAttack = 0f;              // timer for heavy attack's input buffering
+    private ParticleSystem bursts;
+    private float cooldown_heavyAttack = 1f;                // cooldown between heavy attacks
+    private float lasttime_heavyAttack = -Mathf.Infinity;   // last time player heavy attacked
+    private float bufferTimer_heavyAttack = 0f;             // timer for heavy attack's input buffering
     private float buffer_heavyAttack = 0.15f;
-    private float recoil = 15f;                              // amount of velocity added when heavy attacking
+    private float recoil = 15f;                             // amount of velocity added when heavy attacking
+    private bool heavyAttackAvailable = true;
 
     [Header("Dash")]
     public GameObject dashParticlePrefab;           // particle effect after dashing
@@ -70,10 +73,16 @@ public class character_movement : MonoBehaviour
     // Start is called once before the first execution of Update
     void Start()
     {
-        body = GetComponent<Rigidbody2D>();
-        sprite = GetComponentInChildren<Transform>();
-        targetScale = Vector3.one;
+        body = GetComponent<Rigidbody2D>();             // physics body
+        sprite = GetComponentInChildren<Transform>();   // child sprite transform
+        sr = GetComponentInChildren<SpriteRenderer>();  // child sprite renderer
+
+        // particles
         moveParticles = transform.Find("particles").GetComponent<ParticleSystem>(); // movement particle system
+        bursts = transform.Find("bursts").GetComponent<ParticleSystem>();
+
+        // misc variable init
+        targetScale = Vector3.one;
     }
 
     // Event-driven stuff (i.e. left click for attack)
@@ -111,8 +120,19 @@ public class character_movement : MonoBehaviour
         }
 
 
-        /* PARTICLES OR SOMETHING */
+        /* VISUALS OR SOMETHING */
         UpdateMoveParticles();
+        if (Time.time - lasttime_heavyAttack >= cooldown_heavyAttack && heavyAttackAvailable == false)
+        {
+            heavyAttackAvailable = true;
+
+            // particle burst when heavy attack becomes available again
+            bursts.Emit(1);
+
+            Color c = sr.color;
+            c.a = 1f;               // set alpha back to 1 if heavy attack available
+            sr.color = c;
+        }
 
 
         /* INPUT BUFFERS */
@@ -318,8 +338,13 @@ public class character_movement : MonoBehaviour
 
     void HeavyAttack()
     {
+        heavyAttackAvailable = false;
         Quaternion aimAngleEuler;
         lasttime_heavyAttack = Time.time;
+        Color c = sr.color;
+        c.a = 0.5f; // change alpha of sprite since heavy attack just performed
+        Debug.Log("Heavy attacked, alpha changed");
+        sr.color = c;
 
         // convert the screen pos (pixels) of the mouse to the world pos (coords)
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
@@ -372,18 +397,18 @@ public class character_movement : MonoBehaviour
     }
 
 
-    /* COMMITED:
+    /* TODO:
     + heavy attack spritesheet
         + heavy attack implementation
+        = lower player alpha when heavy attack not available?
+        = particle effect when heavy attack becomes available?
     + dash implementation
         + fix end of dash re-deceleration
         + dash input buffering
         + dash particle effect
     + redo squash/stretch to be max velocity (dash speed) based
     + fix physics engine (again)
-    */
 
-    /* TODO:
     = hitboxes/hurtboxes
         = player
         = enemy (?)
