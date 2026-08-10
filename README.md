@@ -5,6 +5,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 <details>
     <summary>Base player stuff</summary>
 
+
     - [x] Player sprite
     - [x] Player movement
         - [x] Fix player movement
@@ -16,6 +17,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 <details>
     <summary>Light attack</summary>
 
+
     - [x] Sprite
     - [x] Implementation
     - [x] Hitbox
@@ -24,6 +26,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 <details>
     <summary>Heavy Attack</summary>
+
 
     - [x] Sprite
     - [x] Implementation
@@ -34,6 +37,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 <details>
     <summary>Dash</summary>
+
 
     - [x] Movement component
         - [x] Fix deceleration
