@@ -1,3 +1,6 @@
+using System;
+using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 // using System;
@@ -15,9 +18,9 @@ public class character_movement : MonoBehaviour
     SpriteRenderer sr;
 
     [Header("Physics")]
-    private const float ACCEL = 1f;        // how fast to speed up (directly adds to velocity so is smaller)
-    private const float DAMPING = 10f;     // how fast to slow down (uses lerp so is way bigger)
-    private const float runSpeed = 5.5f;        // base movement speed
+    private const float ACCEL = 50f;        // how fast to speed up (uses addForce so is bigger)
+    private const float DAMPING = 5f;     // how fast to slow down (uses lerp so smaller)
+    private const float runSpeed = 2f;        // base movement speed
     private ParticleSystem moveParticles;
 
     [Header("Squash & Stretch")]
@@ -37,12 +40,12 @@ public class character_movement : MonoBehaviour
 
     [Header("Heavy Attack")]
     public GameObject heavyAttack_prefab;
-    private ParticleSystem bursts;
+    private ParticleSystem heavyAttackIndicator;
     private float cooldown_heavyAttack = 1f;                // cooldown between heavy attacks
     private float lasttime_heavyAttack = -Mathf.Infinity;   // last time player heavy attacked
     private float bufferTimer_heavyAttack = 0f;             // timer for heavy attack's input buffering
-    private float buffer_heavyAttack = 0.15f;
-    private float recoil = 15f;                             // amount of velocity added when heavy attacking
+    private float buffer_heavyAttack = 0.2f;
+    private float recoil = 200f;                             // amount of velocity added when heavy attacking
     private bool heavyAttackAvailable = true;
 
     [Header("Dash")]
@@ -52,14 +55,14 @@ public class character_movement : MonoBehaviour
     private float lastDashTime = -Mathf.Infinity;   // time of the last dash
     private Vector2 dashDirection;                  // dash direction
     private Vector2 lastFacingDirection;            // direction the player last faced
-    private float dashSpeed = 3f * runSpeed;        // dash speed
+    private float dashSpeed = 16;        // dash speed
     private float dashDuration = 0.2f;              // dash duration
     private float dashCooldown = 0.5f;              // dash cooldown (wow these comments are so helpful)
     private float lasttime_dash = -Mathf.Infinity;  // last time player dashed
     private float bufferTimer_dash = 0f;            // timer for dash input buffering
-    private float buffer_dash = 0.2f;               // input buffer duration for dash
+    private float buffer_dash = 0.15f;               // input buffer duration for dash
 
-
+    private bool flag;  // debug testing to see if child transform was assigned properly
 
     // Unity functions
 
@@ -74,12 +77,13 @@ public class character_movement : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody2D>();             // physics body
-        sprite = GetComponentInChildren<Transform>();   // child sprite transform
+        sprite = transform.Find("playerSprite");   // child sprite transform
+        flag = sprite != null;
         sr = GetComponentInChildren<SpriteRenderer>();  // child sprite renderer
 
         // particles
         moveParticles = transform.Find("particles").GetComponent<ParticleSystem>(); // movement particle system
-        bursts = transform.Find("bursts").GetComponent<ParticleSystem>();
+        heavyAttackIndicator = transform.Find("heavyAttackIndicator").GetComponent<ParticleSystem>();
 
         // misc variable init
         targetScale = Vector3.one;
@@ -108,67 +112,65 @@ public class character_movement : MonoBehaviour
     {   
 
         /* MOVEMENT AND MOUSE INPUTS */
-
-        moveInput = inputActions.Player.Move.ReadValue<Vector2>();  // read player input
-        ApplySquashStretch();       // procedural animation !!1!
-
-        mouseScreenPos = inputActions.Player.Look.ReadValue<Vector2>(); // read the mouse's screen position
-
-        if (moveInput != Vector2.zero)
-        {
-            lastFacingDirection = moveInput;
-        }
-
+        ReadInputs();
 
         /* VISUALS OR SOMETHING */
+        ApplySquashStretch();
         UpdateMoveParticles();
-
-        if (Time.time - lasttime_heavyAttack >= cooldown_heavyAttack && heavyAttackAvailable == false)
-        {
-            heavyAttackAvailable = true;
-
-            // particle burst when heavy attack becomes available again
-            bursts.Emit(1);
-
-            Color c = sr.color;
-            c.a = 1f;               // set alpha back to 1 if heavy attack available
-            sr.color = c;
-        }
-
+        HeavyAttackCooldown();
 
         /* INPUT BUFFERS */
-
-        if (bufferTimer_lightAttack > 0)    // if buffered light attack input
-        {
-            bufferTimer_lightAttack -= Time.deltaTime;
-            if (Time.time - lasttime_lightAttack >= cooldown_lightAttack)
-            {
-                LightAttack();  
-            }
-        }
-        if (bufferTimer_heavyAttack > 0)
-        {
-            bufferTimer_heavyAttack -= Time.deltaTime;
-            if (Time.time - lasttime_heavyAttack >= cooldown_heavyAttack)
-            {
-                HeavyAttack();
-            }
-        }
-        if (bufferTimer_dash > 0)           // if buffered dash input
-        {
-            bufferTimer_dash -= Time.deltaTime;
-            if (Time.time - lasttime_dash >= dashCooldown)
-            {
-                Dash();
-            }
-        }
-
+        // light attack buffer
+        Buffer(ref bufferTimer_lightAttack, lasttime_lightAttack, cooldown_lightAttack, LightAttack);
+        // heavy attack buffer
+        Buffer(ref bufferTimer_heavyAttack, lasttime_heavyAttack, cooldown_heavyAttack, HeavyAttack);
+        // dash buffer
+        Buffer(ref bufferTimer_dash, lasttime_dash, dashCooldown, Dash);
     }
 
     // Use FixedUpdate for physics related stuff (independent of frame rate) 
     void FixedUpdate() 
     {   
-        // dash physics
+        
+        // read player input and apply movement
+        PlayerMovement();
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* PLAYER FUNCTIONS */
+
+    // read mouse position and set a movement flag
+    void ReadInputs()
+    {
+        moveInput = inputActions.Player.Move.ReadValue<Vector2>();  // read player input
+        mouseScreenPos = inputActions.Player.Look.ReadValue<Vector2>(); // read the mouse's screen position
+        if (moveInput != Vector2.zero)
+        {
+            lastFacingDirection = moveInput;
+        }
+    }
+
+    // actual movement control
+    void PlayerMovement()
+    {
+        // if dashing, override regular movement
         if (isDashing)
         {
             dashTimer -= Time.fixedDeltaTime;
@@ -186,41 +188,60 @@ public class character_movement : MonoBehaviour
             return;     // skip regular movement if dashing
         }
 
-
-
+        // otherwise, regular movement
         // get movement inputs
         Vector2 inputMoveDirection = moveInput.normalized;
-
+        
         // vector movement physics
-        if (inputMoveDirection != Vector2.zero && body.linearVelocity.magnitude < runSpeed)
+        if (inputMoveDirection != Vector2.zero)
         {
-            body.linearVelocity += inputMoveDirection * ACCEL;
+            body.AddForce(inputMoveDirection * ACCEL, ForceMode2D.Force);
+            // clamp if exceeding max speed
+            if (body.linearVelocity.magnitude > runSpeed)
+            {
+                // body.linearVelocity = body.linearVelocity.normalized * runSpeed;
+
+                // project velocity onto input direction
+                float inputAlignedSpeed = Vector2.Dot(body.linearVelocity, inputMoveDirection);
+                
+                if (inputAlignedSpeed > runSpeed)
+                {
+                    // lerp the excess back toward cap, preserving recoil
+                    Vector2 targetVelocity = body.linearVelocity.normalized * runSpeed;
+                    body.linearVelocity = Vector2.Lerp(body.linearVelocity, targetVelocity, Time.fixedDeltaTime * DAMPING * 2.5f);
+                }
+            }
         }
         else
         {
             body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * DAMPING);
         }
+
+        // Debug.Log(body.linearVelocity.magnitude);
     }
-
-
-
-    /* PLAYER FUNCTIONS */
 
     // procedural animation wowzers
     void ApplySquashStretch()
     {
         Vector2 velocity = body.linearVelocity;
         float speed = velocity.magnitude;
-        float normalizedSpeed = Mathf.Clamp01(speed / dashSpeed);
+        float normalizedSpeed = Mathf.Clamp01(speed / dashSpeed);   // 0-1 based on how fast player is moving
 
-        if (speed > 0.1f)
+        if (speed < 0.05f)
+        {
+            sprite.rotation = Quaternion.identity;//Quaternion.Euler(0f, 0f, Mathf.Atan2(lastFacingDirection.y, lastFacingDirection.x) * Mathf.Rad2Deg);
+            sprite.localScale = Vector3.one;
+            return;
+        }
+
+        if (speed > 1f)
         {
             float stretch = 1f + squashStretchAmount * normalizedSpeed;
             float squash = 1f / stretch;
 
             targetScale = new Vector3(squash, stretch, 1f);
 
-            float angle = Mathf.Atan2(velocity.x, velocity.y) * Mathf.Rad2Deg;
+            float angle = Mathf.Atan2(velocity.x, velocity.y) * Mathf.Rad2Deg;  // calc angle of movement
             sprite.rotation = Quaternion.Lerp(
                 sprite.rotation,
                 Quaternion.Euler(0f, 0f, -angle),
@@ -230,11 +251,6 @@ public class character_movement : MonoBehaviour
         else
         {
             targetScale = Vector3.one;
-            // sprite.rotation = Quaternion.Lerp(
-            //     sprite.rotation,
-            //     Quaternion.identity,
-            //     Time.deltaTime * squashStretchSpeed
-            // );
         }
 
         sprite.localScale = Vector3.Lerp(
@@ -267,6 +283,18 @@ public class character_movement : MonoBehaviour
 
 
     /* EVENT DRIVEN PLAYER ACTIONS (called by input buffers) */
+    // the input buffer function
+    void Buffer(ref float bufferTimer, float lastTime, float cooldown, System.Action function)
+    {
+        if (bufferTimer > 0)
+        {
+            bufferTimer -= Time.unscaledDeltaTime;
+            if (Time.unscaledTime - lastTime >= cooldown)
+            {
+                function();
+            }
+        }
+    }
 
     // on left click (light attack):
     void OnLightAttack(InputAction.CallbackContext context)
@@ -287,7 +315,6 @@ public class character_movement : MonoBehaviour
     }
 
 
-
     /* PLAYER ACTIONS */
 
     // light attack
@@ -296,7 +323,7 @@ public class character_movement : MonoBehaviour
         counter += 1;
         bool mirror = (counter % 2 == 0);   // if odd, do normal attack; if even, do mirrored attack flipped 180deg
         Quaternion aimAngleEuler;
-        lasttime_lightAttack = Time.time;
+        lasttime_lightAttack = Time.unscaledTime;
         
         // convert the screen pos (pixels) of the mouse to the world pos (coords)
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
@@ -330,11 +357,11 @@ public class character_movement : MonoBehaviour
         Destroy(slash, 0.3f);
 
         // debugging
-        Debug.Log("Clicked: " + counter.ToString() + 
-            ", body (" + body.position.x.ToString() + "," + body.position.y.ToString() + 
-            "), mouse (" + mouseWorldPos.x.ToString() + "," + mouseWorldPos.y.ToString() + 
-            "), aimAngle: " + aimAngle.ToString()
-        );
+        // Debug.Log("Clicked: " + counter.ToString() + 
+        //     ", body (" + body.position.x.ToString() + "," + body.position.y.ToString() + 
+        //     "), mouse (" + mouseWorldPos.x.ToString() + "," + mouseWorldPos.y.ToString() + 
+        //     "), aimAngle: " + aimAngle.ToString()
+        // );
     }
 
     void HeavyAttack()
@@ -342,12 +369,13 @@ public class character_movement : MonoBehaviour
         heavyAttackAvailable = false;
         Quaternion aimAngleEuler;
 
-        lasttime_heavyAttack = Time.time;
+        lasttime_heavyAttack = Time.unscaledTime;
         Color c = sr.color;
         c.a = 0.5f; // change alpha of sprite since heavy attack just performed
-        Debug.Log("Heavy attacked, alpha changed");
+        // Debug.Log("Heavy attacked, alpha changed");
         sr.color = c;
-        bursts.Clear();
+        heavyAttackIndicator.Clear();   // clear the particle indicator
+        heavyAttackIndicator.Emit(1);   // restart the particle indicator
 
         // convert the screen pos (pixels) of the mouse to the world pos (coords)
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
@@ -361,22 +389,40 @@ public class character_movement : MonoBehaviour
         //heavyAttackSprite.color = new Color32(236, 229, 62, 255);     // same yellow as sprite
         heavyAttack.transform.localScale = new Vector3(3f, 2f, 1f);
 
-        body.linearVelocity = new Vector2(
-            Mathf.Cos((aimAngle + 180f) * Mathf.Deg2Rad),
-            Mathf.Sin((aimAngle + 180f) * Mathf.Deg2Rad)
-        ) * recoil + body.linearVelocity;
+        // body.linearVelocity = new Vector2(
+        //     Mathf.Cos((aimAngle + 180f) * Mathf.Deg2Rad),
+        //     Mathf.Sin((aimAngle + 180f) * Mathf.Deg2Rad)
+        // ) * recoil + body.linearVelocity;
+
+        body.AddForce(((Vector2)transform.position - mouseWorldPos) * recoil, ForceMode2D.Force);
+
+        // body.AddForce(inputMoveDirection * ACCEL, ForceMode2D.Force);
+
 
         Destroy(heavyAttack, 0.3f);
+    }
+
+    // calculates time until heavy attack is available again, and sets color indicators
+    void HeavyAttackCooldown()
+    {
+        if (Time.unscaledTime - lasttime_heavyAttack >= cooldown_heavyAttack && heavyAttackAvailable == false)
+        {
+            heavyAttackAvailable = true;
+
+            Color c = sr.color;
+            c.a = 1f;               // set alpha back to 1 if heavy attack available
+            sr.color = c;
+        }
     }
 
     // dash action
     void Dash()
     {
-        if (Time.time - lastDashTime >= dashCooldown && !isDashing)
+        if (Time.unscaledTime - lastDashTime >= dashCooldown && !isDashing)
         {
             isDashing = true;
             dashTimer = dashDuration;
-            lastDashTime = Time.time;
+            lastDashTime = Time.unscaledTime;
             dashDirection = moveInput.normalized;
 
             // if standing still, dash to the last facing direction
@@ -422,6 +468,7 @@ public class character_movement : MonoBehaviour
         = attack animation (?)
         = ai????
         = pathfinding (probably delay until i actually add a proper map)
+    + all this moved to readme
     */
 
 
