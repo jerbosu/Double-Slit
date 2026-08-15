@@ -60,7 +60,8 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
     - Answer: the original max speed condition would allow addForce until movespeed hit the max speed. However, this accelerated the speed past the max, where it would then damp back below max speed, then get another push from addForce... etc. Fixed by doing the speed check AFTER addForce instead of before, and by clamping if it failed.
 - [x] Redo the heavy attack indicator to exponentially fade in instead of just appear
     - Right now, the indicator (a single particle) is timed to finish fading in just as heavy attack becomes available. In the future, care should be taken to not desync this timing (i.e. hitstops).
-- [ ] Allow max velocity to be exceeded through a combination of player movement and recoil, but not player movement alone
+- [x] Allow max velocity to be exceeded through a combination of player movement and recoil, but not player movement alone
+    - Solution: instead of clamping at max velocity, lerp downwards instead, and reduce the speed cap. The lerp and addForce find a equilibrium based on the set speed cap, but bursts are still allowed to briefly push past it. 
 - [x] Clean up inside of main functions (mainly Update and FixedUpdate) to not have scattered code everywhere
 
 </details>
