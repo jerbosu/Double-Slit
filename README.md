@@ -2,8 +2,7 @@
 A 2D top down action game built in Unity. My first game coding project. Inspired by many other games, as well as the experiment of the same name. 
 
 ## Objectives
-### Week 1
-#### Aug 2-8
+### Week 1 (Aug 2-8)
 <details>
     <summary>Base player stuff</summary>
 
@@ -37,8 +36,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
     
 </details>
 
-### Week 2
-#### Aug 9-15
+### Week 2 (Aug 9-15)
 <details>
     <summary>Dash</summary>
 
@@ -77,8 +75,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 
 </details>
 
-### Week 3
-#### Aug 16-22
+### Week 3 (Aug 16-22)
 <details>
     <summary>Misc</summary>
 
