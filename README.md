@@ -61,21 +61,48 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 - [x] Redo the heavy attack indicator to exponentially fade in instead of just appear
     - Right now, the indicator (a single particle) is timed to finish fading in just as heavy attack becomes available. In the future, care should be taken to not desync this timing (i.e. hitstops).
 - [x] Allow max velocity to be exceeded through a combination of player movement and recoil, but not player movement alone
-    - Solution: instead of clamping at max velocity, lerp downwards instead, and reduce the speed cap. The lerp and addForce find a equilibrium based on the set speed cap, but bursts are still allowed to briefly push past it. 
+    - Solution: instead of clamping at max velocity, lerp downwards instead with a lower speed cap. The lerp and addForce find a equilibrium slightly above the set speed cap, but bursts are still allowed to briefly push past it. 
 - [x] Clean up inside of main functions (mainly Update and FixedUpdate) to not have scattered code everywhere
+
+</details>
+
+<details>
+<summary>Gameplay preparation</summary>
+
+- [x] Bounding arena box
+- [x] Change cooldowns and particle systems to use unscaledTime in preparation for hitstop implementation
+    - This prevents the heavy attack indicator from desyncing, and also rewards landing a heavy attack or gives leniency when taking a strong attack 
+
+</details>
+
+### Week 3
+<details>
+    <summary>Misc</summary>
+
+- [x] Reorganize scripts folder (will probably do the same with other asset folders in the future)
+- [x] Separate the squash/stretch code from the player so that it can be used for separate gameobjects
+    - Created a new squash/stretch script, which can be attached to the visual of anything that needs it
+- [x] Have heavy attack inherit the velocity of the player
+- [ ] Possibly change heavy attack to a single object that fades away rather than a sprite animation?
 
 </details>
 
 <details> 
     <summary>First enemy</summary>
 
-- [x] Bounding arena box
-- [ ] Enemy sprite
-- [ ] Enemy hitbox
+- [ ] Enemy visuals
+    - [x] Sprite
+    - [x] Squash/stretch (very easy now that squash/stretch is its own script)
+    - [ ] Attack indicator
+- [x] Enemy hitbox
+- [ ] Enemy behaviour
+    - [x] Move towards/away from player if too far/close
+    - [x] Somewhat circle player at a set distance for a random amount of time
+    - [ ] Attack player when time is up
+    - [ ] Retreat after attacking or after taking significant damage
+
 - [ ] Hitbox interaction
 - [ ] HITSTOPS: Time.timeScale = 0f for full stop. Note that Time.unscaledDeltaTime is unaffected
-    - [x] Change cooldowns and particle systems to use unscaledTime. 
-        - This prevents the heavy attack indicator from desyncing, and also rewards landing a strong attack or gives leniency when taking a strong attack 
 - [ ] Basic pathfinding AI?
 - [ ] Basic moveset?
 

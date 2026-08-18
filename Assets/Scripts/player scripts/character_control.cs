@@ -23,12 +23,6 @@ public class character_movement : MonoBehaviour
     private const float runSpeed = 2f;        // base movement speed
     private ParticleSystem moveParticles;
 
-    [Header("Squash & Stretch")]
-    private Vector3 targetScale;                    // target for squash/stretch scaling (depends on speed)
-    private float squashStretchAmount = 0.4f;         // squash/stretch magnitude
-    private float squashStretchSpeed = 100f;         // squash/stretch speed
-    private Transform sprite;                        // player sprite transform
-
     [Header("Light Attack")]
     public GameObject lightAttack_prefab;
     private int counter = 0;                    // counter for debugging, global cuz ion want it to be reset locally
@@ -45,7 +39,7 @@ public class character_movement : MonoBehaviour
     private float lasttime_heavyAttack = -Mathf.Infinity;   // last time player heavy attacked
     private float bufferTimer_heavyAttack = 0f;             // timer for heavy attack's input buffering
     private float buffer_heavyAttack = 0.2f;
-    private float recoil = 200f;                             // amount of velocity added when heavy attacking
+    private float recoil = 4f;                             // amount of velocity added when heavy attacking
     private bool heavyAttackAvailable = true;
 
     [Header("Dash")]
@@ -55,7 +49,7 @@ public class character_movement : MonoBehaviour
     private float lastDashTime = -Mathf.Infinity;   // time of the last dash
     private Vector2 dashDirection;                  // dash direction
     private Vector2 lastFacingDirection;            // direction the player last faced
-    private float dashSpeed = 16;        // dash speed
+    private float dashSpeed = 14;        // dash speed
     private float dashDuration = 0.2f;              // dash duration
     private float dashCooldown = 0.5f;              // dash cooldown (wow these comments are so helpful)
     private float lasttime_dash = -Mathf.Infinity;  // last time player dashed
@@ -77,16 +71,11 @@ public class character_movement : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody2D>();             // physics body
-        sprite = transform.Find("playerSprite");   // child sprite transform
-        flag = sprite != null;
         sr = GetComponentInChildren<SpriteRenderer>();  // child sprite renderer
 
         // particles
         moveParticles = transform.Find("particles").GetComponent<ParticleSystem>(); // movement particle system
         heavyAttackIndicator = transform.Find("heavyAttackIndicator").GetComponent<ParticleSystem>();
-
-        // misc variable init
-        targetScale = Vector3.one;
     }
 
     // Event-driven stuff (i.e. left click for attack)
@@ -115,7 +104,7 @@ public class character_movement : MonoBehaviour
         ReadInputs();
 
         /* VISUALS OR SOMETHING */
-        ApplySquashStretch();
+        // ApplySquashStretch();
         UpdateMoveParticles();
         HeavyAttackCooldown();
 
@@ -220,46 +209,6 @@ public class character_movement : MonoBehaviour
         // Debug.Log(body.linearVelocity.magnitude);
     }
 
-    // procedural animation wowzers
-    void ApplySquashStretch()
-    {
-        Vector2 velocity = body.linearVelocity;
-        float speed = velocity.magnitude;
-        float normalizedSpeed = Mathf.Clamp01(speed / dashSpeed);   // 0-1 based on how fast player is moving
-
-        if (speed < 0.05f)
-        {
-            sprite.rotation = Quaternion.identity;//Quaternion.Euler(0f, 0f, Mathf.Atan2(lastFacingDirection.y, lastFacingDirection.x) * Mathf.Rad2Deg);
-            sprite.localScale = Vector3.one;
-            return;
-        }
-
-        if (speed > 1f)
-        {
-            float stretch = 1f + squashStretchAmount * normalizedSpeed;
-            float squash = 1f / stretch;
-
-            targetScale = new Vector3(squash, stretch, 1f);
-
-            float angle = Mathf.Atan2(velocity.x, velocity.y) * Mathf.Rad2Deg;  // calc angle of movement
-            sprite.rotation = Quaternion.Lerp(
-                sprite.rotation,
-                Quaternion.Euler(0f, 0f, -angle),
-                Time.deltaTime * squashStretchSpeed
-            );
-        }
-        else
-        {
-            targetScale = Vector3.one;
-        }
-
-        sprite.localScale = Vector3.Lerp(
-            sprite.localScale,
-            targetScale,
-            Time.deltaTime * squashStretchSpeed
-        );
-    }
-
     // movement particles
     void UpdateMoveParticles()
     {
@@ -346,11 +295,11 @@ public class character_movement : MonoBehaviour
 
         if (mirror)
         {
-            slash.transform.localScale = new Vector3(-2f, 1.5f, 1f);
+            slash.transform.localScale = new Vector3(-2.5f, 2f, 1f);
         }
         else
         {
-            slash.transform.localScale = new Vector3(2f, 1.5f, 1f);
+            slash.transform.localScale = new Vector3(2.5f, 2f, 1f);
         }
 
         // destroy it 0.3 seconds after creation (animation lasts 7/30 = 0.233 seconds)
@@ -385,19 +334,13 @@ public class character_movement : MonoBehaviour
         aimAngleEuler = Quaternion.Euler(0f, 0f, aimAngle);
 
         GameObject heavyAttack = Instantiate(heavyAttack_prefab, transform.position, aimAngleEuler);
-        SpriteRenderer heavyAttackSprite = heavyAttack.GetComponentInChildren<SpriteRenderer>();
-        //heavyAttackSprite.color = new Color32(236, 229, 62, 255);     // same yellow as sprite
-        heavyAttack.transform.localScale = new Vector3(3f, 2f, 1f);
+        Rigidbody2D spawnedBody = heavyAttack.GetComponent<Rigidbody2D>();
+        if (spawnedBody != null) {
+            spawnedBody.linearVelocity = body.linearVelocity;   // inherit player velocity
+        }
+        heavyAttack.transform.localScale = new Vector3(4f, 2f, 1f);            
 
-        // body.linearVelocity = new Vector2(
-        //     Mathf.Cos((aimAngle + 180f) * Mathf.Deg2Rad),
-        //     Mathf.Sin((aimAngle + 180f) * Mathf.Deg2Rad)
-        // ) * recoil + body.linearVelocity;
-
-        body.AddForce(((Vector2)transform.position - mouseWorldPos) * recoil, ForceMode2D.Force);
-
-        // body.AddForce(inputMoveDirection * ACCEL, ForceMode2D.Force);
-
+        body.AddForce(((Vector2)transform.position - mouseWorldPos) * recoil, ForceMode2D.Impulse);
 
         Destroy(heavyAttack, 0.3f);
     }
@@ -446,30 +389,4 @@ public class character_movement : MonoBehaviour
 
         Destroy(particles, 1f);
     }
-
-
-    /* TODO:
-    + heavy attack spritesheet
-        + heavy attack implementation
-        + lower player alpha when heavy attack not available
-        + particle effect when heavy attack becomes available: player flashes
-    + dash implementation
-        + fix end of dash re-deceleration
-        + dash input buffering
-        + dash particle effect
-    + redo squash/stretch to be max velocity (dash speed) based
-    + fix physics engine (again)
-
-    = hitboxes/hurtboxes
-        = player
-        = enemy (?)
-    = first enemy implementation
-        = sprite
-        = attack animation (?)
-        = ai????
-        = pathfinding (probably delay until i actually add a proper map)
-    + all this moved to readme
-    */
-
-
 }
