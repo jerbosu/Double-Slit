@@ -94,12 +94,22 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
     - [x] Sprite
     - [x] Squash/stretch (very easy now that squash/stretch is its own script)
     - [ ] Attack indicator
-- [x] Enemy hitbox
-- [ ] Enemy behaviour
+        - [x] Attack telegraph script (rectangle)
+            - This will scale Unity's basic square to the size of the attack hitbox, and fill it up to show how long until the attack happens. 
+        - [ ] Implement prefab on enemy
+- [x] Enemy collider
+- [ ] Enemy hurtbox
+- [ ] Attack hitbox
+- [ ] Enemy parry window
+- [ ] Enemy behaviour (this was so much more difficult than I thought it would be)
     - [x] Move towards/away from player if too far/close
+    - [x] Occasionally idle
     - [x] Somewhat circle player at a set distance for a random amount of time
-    - [ ] Attack player when time is up
-    - [ ] Retreat after attacking or after taking significant damage
+    - [x] Attack player when time is up
+    - [x] Temporary retreat after attacking or after taking significant damage
+
+- [x] Rewrite enemy control script to use IEnum and case switching instead of if else spaghetti
+    - It's still spaghetti but it's more readable
 
 - [ ] Hitbox interaction
 - [ ] HITSTOPS: Time.timeScale = 0f for full stop. Note that Time.unscaledDeltaTime is unaffected
