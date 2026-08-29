@@ -148,8 +148,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1088887856}
+  m_Children: []
   m_Father: {fileID: 82556410}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &17429595
@@ -224,7 +223,7 @@ GameObject:
   - component: {fileID: 29905185}
   - component: {fileID: 29905184}
   m_Layer: 6
-  m_Name: playerHurtbox
+  m_Name: hurtbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5190,7 +5189,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f235211411e74e644bdff6ba8bd3447a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::enemy1_control
-  health: 30
+  health: 10
   minCircleTime: 0
   maxCircleTime: 1
   minIdleTime: 0
@@ -5243,6 +5242,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 17429594}
+  - {fileID: 1088887856}
   - {fileID: 443070505}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11738,16 +11738,6 @@ MonoBehaviour:
   lightAttack_prefab: {fileID: 6759755800798216815, guid: 64e90ab1a448f6d49afdee392aaeb2af, type: 3}
   heavyAttack_prefab: {fileID: 1997468766629859393, guid: 6de3ec533884ff64ab3cfe5f8f5a5b98, type: 3}
   dashParticlePrefab: {fileID: 6496153390781297091, guid: c292088f1c076be44b9a9642ea4839b6, type: 3}
-  hitboxSizeCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  hitboxStartSize: {x: 0.5, y: 0.5}
-  hitboxEndSize: {x: 2, y: 2}
-  hitboxStartOffset: {x: 0, y: 0.5}
-  hitboxEndOffset: {x: 0, y: 2}
 --- !u!58 &1061180921
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -11794,9 +11784,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1088887856}
   - component: {fileID: 1088887857}
-  - component: {fileID: 1088887858}
   m_Layer: 8
-  m_Name: enemyHurtbox
+  m_Name: hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11810,12 +11799,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1088887855}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 17429594}
+  m_Father: {fileID: 82556410}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &1088887857
 CapsuleCollider2D:
@@ -11854,19 +11843,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.35, y: 0.35}
   m_Direction: 1
---- !u!114 &1088887858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1088887855}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8996e2e517ab33a418e2e31fec29b82c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Hurtbox
-  maxHealth: 300
 --- !u!1 &1396460365
 GameObject:
   m_ObjectHideFlags: 0

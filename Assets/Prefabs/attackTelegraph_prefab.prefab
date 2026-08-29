@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8424476902009874373}
   - component: {fileID: 3097212249076452156}
   m_Layer: 0
-  m_Name: attackIndicator_prefab
+  m_Name: attackTelegraph_prefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4de267f560662524299d60b5d94de333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  size: {x: 1, y: 3}
+  size: {x: 0.35, y: 2.5}
   duration: 1
-  emptyColor: {r: 1, g: 0, b: 0, a: 0.2}
-  fullColor: {r: 1, g: 0, b: 0, a: 0.6}
+  lockTime: 0.5
+  color: {r: 1, g: 0, b: 0, a: 0.3}

@@ -3,80 +3,82 @@ using System.Collections;
 
 public class AttackTelegraph : MonoBehaviour
 {
-    public Vector2 size = new Vector2(1f, 3f);
+    public Vector2 size = new Vector2(0.35f, 2.5f);          // telegraph size
     public float duration = 1f;
-    public Color emptyColor = new Color(1f, 0f, 0f, 0.2f);
-    public Color fullColor = new Color(1f, 0f, 0f, 0.6f);
+    public float lockTime = 0.3f;
+    public Color color = new Color(1f, 0f, 0f, 0.1f);   // transparent red
 
-    private SpriteRenderer outline;     // attack indicator outline child sprite
-    private SpriteRenderer fill;        // attack indicator filler child sprite
+    private SpriteRenderer sr;
+    private Transform enemy;
+    private Transform player;
+    private bool locked = false;
+
+    private static Sprite _defaultSprite;
 
     void Awake()
     {
-        // outline
-        GameObject outlineObj = new GameObject("Outline");      // make a new gameobject
-        outlineObj.transform.SetParent(transform);              // set its parent to the prefab
-        outlineObj.transform.localPosition = Vector3.zero;      // pos relative to parent
-        outline = outlineObj.AddComponent<SpriteRenderer>();    // add SpriteRenderer component to gameobject
-        outline.sprite = GetDefaultSprite();                    // get default unity square
-        outline.color = emptyColor;                             // yeah
-        outline.transform.localScale = new Vector3(size.x, size.y, 1f);
-
-        // fill starts at zero height
-        GameObject fillObj = new GameObject("Fill");
-        fillObj.transform.SetParent(transform);
-        fillObj.transform.localPosition = new Vector3(0f, -size.y * 0.5f, 0f); // anchor to bottom
-        fill = fillObj.AddComponent<SpriteRenderer>();
-        fill.sprite = GetDefaultSprite();
-        fill.color = fullColor;
-        fill.transform.localScale = new Vector3(size.x, 0f, 1f);
-        fill.sortingOrder = 1; // render on top of outline
-
-        StartCoroutine(Fill());
+        sr = gameObject.AddComponent<SpriteRenderer>();
+        sr.sprite = GetDefaultSprite();
+        sr.color = color;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public void Init(Transform enemyTransform, Transform playerTransform)
     {
-        
+        enemy = enemyTransform;
+        sr.sortingOrder = enemyTransform.Find("sprite").GetComponentInChildren<SpriteRenderer>().sortingOrder - 1;
+        player = playerTransform;
+        StartCoroutine(Run());
+        transform.localScale = new Vector3(size.x, size.y, 1f);     // resize in Init cuz Awake is too early
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
-
-
-
-
-
-
-
-
-    /* NON UNITY FUNCTIONS */
-
-    IEnumerator Fill()
+    IEnumerator Run()
     {
         float elapsed = 0f;
-        while (elapsed < duration)
+        float trackDuration = duration - lockTime;
+
+        // track player for most of the windup
+        while (elapsed < trackDuration)
         {
+            AimAtPlayer();
             elapsed += Time.deltaTime;
-            float progress = elapsed / duration;
-
-            // grow fill upward from bottom
-            float fillHeight = size.y * progress;
-            fill.transform.localScale = new Vector3(size.x, fillHeight, 1f);
-            fill.transform.localPosition = new Vector3(0f, -size.y * 0.5f + fillHeight * 0.5f, 0f);
-
             yield return null;
         }
+
+        // lock in place for final lockTime seconds
+        locked = true;
+        yield return new WaitForSeconds(lockTime);
+    }
+
+    void AimAtPlayer()
+    {
+        if (enemy == null || player == null) return;
+
+        transform.position = enemy.position;
+        Vector2 direction = ((Vector2)player.position - (Vector2)enemy.position).normalized;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+    }
+
+    void Update()
+    {
+        if (!locked)
+            AimAtPlayer();
     }
 
     Sprite GetDefaultSprite()
     {
-        return Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+        if (_defaultSprite == null)
+        {
+            Texture2D tex = new Texture2D(1, 1);
+            tex.SetPixel(0, 0, Color.white);
+            tex.Apply();
+            _defaultSprite = Sprite.Create(
+                tex,
+                new Rect(0, 0, 1, 1),
+                new Vector2(0.5f, 0f),
+                1f // pixels per unit = 1, so 1 pixel = 1 Unity unit
+            );
+        }
+        return _defaultSprite;
     }
 }

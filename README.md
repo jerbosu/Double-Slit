@@ -98,9 +98,6 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
             - This will scale Unity's basic square to the size of the attack hitbox, and fill it up to show how long until the attack happens. 
         - [ ] Implement prefab on enemy
 - [x] Enemy collider
-- [ ] Enemy hurtbox
-- [ ] Attack hitbox
-- [ ] Enemy parry window
 - [ ] Enemy behaviour (this was so much more difficult than I thought it would be)
     - [x] Move towards/away from player if too far/close
     - [x] Occasionally idle
@@ -110,10 +107,54 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 
 - [x] Rewrite enemy control script to use IEnum and case switching instead of if else spaghetti
     - It's still spaghetti but it's more readable
+</details>
+
+### Week 4 (Aug 23 - 29)
+<details>
+    <summary>Misc</summary>
+
+- [x] Refactor state machine code to make it more readable again. 
+    - Turns out AI is really good at making your code look nice. It's not the best at making functional code though. Or at least the free model isn't. 
+- [x] Disable player hitbox while dashing (i.e. can move through enemies and attacks, but not through walls)
+- [x] Add player healthbar display
+- [ ] Player heavy attack hitbox animation over time
+    - As the heavy attack is a shockwave that moves forward, the hitbox must be animated accordingly
+- [x] Created a general Hurtbox and Hitbox script to use in all attacks
+
+</details>
+
+<details>
+    <summary>Finishing up enemy 1</summary>
+
+- [x] Enemy behaviour (finally done to a sastifactory level)
+    - [x] Move towards/away from player if too far/close
+    - [x] Occasionally idle
+        - Idle until approached by player, then continually seeks out player
+    - [x] Somewhat circle player at a set distance for a random amount of time
+        - Proper circular motion achieved
+    - [x] Attack player when time is up
+        - [x] Greater damping right after the attack so the enemy doesn't fly off into space
+    - [x] Temporary retreat after attacking or after taking significant damage
+
+- [x] Enemy visuals
+    - [x] Attack indicator
+        - [x] Attack telegraph script (rectangle)
+            - This will scale a square to show the AoE of the attack. The attack timing will be shown with a flash. 
+        - [x] Implement prefab on enemy
+        - [x] Fix the indicator (it looks like a stream of rectangles rather than a tracking AoE)
+            - A new coroutine was called every FixedUpdate. Fixed by checking whether the coroutine was null before calling. 
+
+- [x] Enemy hurtbox
+    - [x] Physics interaction after getting hit by the player (i.e. slight knockback for light attack)
+        - Requires significant tweaking to "feel" correct
+        - Current knockback is based on player and enemy position, not attack direction
+    - [ ] Particle effect on death (direction, velocity...)
+- [ ] Attack hitbox
+    - [ ] Physics interaction on hitting the player
+- [ ] Enemy parry window
 
 - [ ] Hitbox interaction
 - [ ] HITSTOPS: Time.timeScale = 0f for full stop. Note that Time.unscaledDeltaTime is unaffected
-- [ ] Basic pathfinding AI?
-- [ ] Basic moveset?
+- [ ] Basic pathfinding?
 
 </details>

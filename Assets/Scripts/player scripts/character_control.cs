@@ -1,6 +1,6 @@
-using System;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
+// using System;
+// using System.Runtime.CompilerServices;
+// using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 // using System;
@@ -49,14 +49,19 @@ public class character_movement : MonoBehaviour
     private float lastDashTime = -Mathf.Infinity;   // time of the last dash
     private Vector2 dashDirection;                  // dash direction
     private Vector2 lastFacingDirection;            // direction the player last faced
-    private float dashSpeed = 14;        // dash speed
+    private float dashSpeed = 14;                   // dash speed
     private float dashDuration = 0.2f;              // dash duration
     private float dashCooldown = 0.5f;              // dash cooldown (wow these comments are so helpful)
     private float lasttime_dash = -Mathf.Infinity;  // last time player dashed
     private float bufferTimer_dash = 0f;            // timer for dash input buffering
-    private float buffer_dash = 0.15f;               // input buffer duration for dash
+    private float buffer_dash = 0.15f;              // input buffer duration for dash
 
-    private bool flag;  // debug testing to see if child transform was assigned properly
+    [Header("Hitbox Animation")]
+    public AnimationCurve hitboxSizeCurve;          // idk
+    public Vector2 hitboxStartSize = new Vector2(0.5f, 0.5f);
+    public Vector2 hitboxEndSize = new Vector2(2f, 2f);
+    public Vector2 hitboxStartOffset = new Vector2(0f, 0.5f);
+    public Vector2 hitboxEndOffset = new Vector2(0f, 2f);
 
     // Unity functions
 
@@ -173,6 +178,7 @@ public class character_movement : MonoBehaviour
             if (dashTimer <= 0f)
             {
                 isDashing = false;
+                gameObject.layer = LayerMask.NameToLayer("Player"); // change layer back
             }
             return;     // skip regular movement if dashing
         }
@@ -290,16 +296,16 @@ public class character_movement : MonoBehaviour
 
         // create a new slash for each left click
         // set the slash position
-        GameObject slash = Instantiate(lightAttack_prefab, transform.position, aimAngleEuler);
+        GameObject slash = Instantiate(lightAttack_prefab, transform.position, aimAngleEuler, transform);
         slash.GetComponent<slash_prefab>().Init(transform);
 
         if (mirror)
         {
-            slash.transform.localScale = new Vector3(-2.5f, 2f, 1f);
+            slash.transform.localScale = new Vector3(-2.5f + Random.Range(-0.1f, 0.1f), 2f + Random.Range(-0.1f, 0.1f), 1f);
         }
         else
         {
-            slash.transform.localScale = new Vector3(2.5f, 2f, 1f);
+            slash.transform.localScale = new Vector3(2.5f + Random.Range(-0.1f, 0.1f), 2f + Random.Range(-0.1f, 0.1f), 1f);
         }
 
         // destroy it 0.3 seconds after creation (animation lasts 7/30 = 0.233 seconds)
@@ -374,6 +380,8 @@ public class character_movement : MonoBehaviour
                 dashDirection = lastFacingDirection.normalized;
             }
 
+            // set layer to the dash layer (so dashing lets you pass through enemies)
+            gameObject.layer = LayerMask.NameToLayer("PlayerDashing");  
             SpawnDashParticles();   // shoot out particle effect behind player when dashing
         }
     }
