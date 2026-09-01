@@ -124,7 +124,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 
 <details>
-    <summary>Finishing up enemy 1</summary>
+    <summary>Finishing up enemy 1 visuals and behaviour</summary>
 
 - [x] Enemy behaviour (finally done to a sastifactory level)
     - [x] Move towards/away from player if too far/close
@@ -149,12 +149,45 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
         - Requires significant tweaking to "feel" correct
         - Current knockback is based on player and enemy position, not attack direction
     - [ ] Particle effect on death (direction, velocity...)
+
+
+</details>
+
+### Week 5 (Aug 30 - Sept 5)
+<details>
+    <summary>Misc</summary>
+
+- [x] On hit effects
+    - [x] Particles on hit (speed scales with damage)
+    - [x] Flash on hit
+- [x] Animate heavy attack hitbox
+- [x] Hurtbox/collider correction
+    - Capsule colliders can only extend along one axis. Matched that axis with the squash/stretch axis for the two gameobjects currently using them. 
+- [x] Hitbox correction
+    - Sometimes the knockback from an attack could cause an enemy to enter, exit, then enter the attack hitbox again, dealing multiple instances of knockback and damage
+    - Fixed by storing and checking if an entity has already been hit by an attack instance
+
+</details>
+
+<details>
+    <summary>Enemy 1 interactions</summary>
+
+- [x] Enemy hurtbox
+    - [x] Physics interaction after getting hit by the player (i.e. slight knockback for light attack)
+        - Requires significant tweaking to "feel" correct
+        - Current knockback is based on player and enemy position, not attack direction. Maybe change later
+    - [ ] Particle effect on death (direction, velocity...)
 - [ ] Attack hitbox
     - [ ] Physics interaction on hitting the player
-- [ ] Enemy parry window
 
-- [ ] Hitbox interaction
-- [ ] HITSTOPS: Time.timeScale = 0f for full stop. Note that Time.unscaledDeltaTime is unaffected
+- [x] Parrying!!!!
+    - [x] General parry script (so enemies can parry as well)
+    - [x] Enemy parry window
+    - [x] Hitstop on parry
+        - [ ] Fix player heavy attack indicator not working despite using unscaled time?
+    
+
+
 - [ ] Basic pathfinding?
 
 </details>

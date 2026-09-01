@@ -3,6 +3,7 @@
 // using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 // using System;
 // using Unity.VisualScripting;
 // using UnityEditor.Rendering;
@@ -81,6 +82,8 @@ public class character_movement : MonoBehaviour
         // particles
         moveParticles = transform.Find("particles").GetComponent<ParticleSystem>(); // movement particle system
         heavyAttackIndicator = transform.Find("heavyAttackIndicator").GetComponent<ParticleSystem>();
+
+        GetComponent<Parryable>().onParried += OnParried;
     }
 
     // Event-driven stuff (i.e. left click for attack)
@@ -237,7 +240,21 @@ public class character_movement : MonoBehaviour
 
 
 
-    /* EVENT DRIVEN PLAYER ACTIONS (called by input buffers) */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* EVENT FUNCTIONS */
     // the input buffer function
     void Buffer(ref float bufferTimer, float lastTime, float cooldown, System.Action function)
     {
@@ -268,6 +285,27 @@ public class character_movement : MonoBehaviour
     {
         bufferTimer_dash = buffer_dash;
     }
+
+    // if player is parried by enemy
+    void OnParried()
+    {
+        
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /* PLAYER ACTIONS */
@@ -340,15 +378,38 @@ public class character_movement : MonoBehaviour
         aimAngleEuler = Quaternion.Euler(0f, 0f, aimAngle);
 
         GameObject heavyAttack = Instantiate(heavyAttack_prefab, transform.position, aimAngleEuler);
+        Hitbox hitbox = heavyAttack.GetComponentInChildren<Hitbox>();
+        hitbox.isParryAttack = true;
         Rigidbody2D spawnedBody = heavyAttack.GetComponent<Rigidbody2D>();
         if (spawnedBody != null) {
             spawnedBody.linearVelocity = body.linearVelocity;   // inherit player velocity
         }
-        heavyAttack.transform.localScale = new Vector3(4f, 2f, 1f);            
+        heavyAttack.transform.localScale = new Vector3(4f, 2f, 1f);
+
+        if (hitbox != null) StartCoroutine(AnimateHitbox(hitbox, 0.3f));
 
         body.AddForce(((Vector2)transform.position - mouseWorldPos) * recoil, ForceMode2D.Impulse);
 
         Destroy(heavyAttack, 0.3f);
+    }
+
+    // animate heavy attack hitbox
+    IEnumerator AnimateHitbox(Hitbox hitbox, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            if (hitbox == null) yield break; // stop if attack was destroyed early
+            elapsed += Time.deltaTime;
+            float t = hitboxSizeCurve.Evaluate(elapsed / duration);
+
+            hitbox.SetShape(
+                Vector2.Lerp(hitboxStartSize, hitboxEndSize, t),
+                Vector2.Lerp(hitboxStartOffset, hitboxEndOffset, t)
+            );
+
+            yield return null;
+        }
     }
 
     // calculates time until heavy attack is available again, and sets color indicators

@@ -181,8 +181,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0.31798962, y: 0.013759204}
-  m_Size: {x: 0.6299816, y: 0.40744248}
+  m_Offset: {x: 0.31673875, y: 0.010006645}
+  m_Size: {x: 0.6274801, y: 0.38993135}
   m_Direction: 1
 --- !u!114 &4957819647545868733
 MonoBehaviour:
@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   damage: 10
-  knockbackForce: 10
+  knockbackForce: 7
 --- !u!1 &6759755800798216815
 GameObject:
   m_ObjectHideFlags: 0
