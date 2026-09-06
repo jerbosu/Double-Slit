@@ -154,6 +154,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 
 ### Week 5 (Aug 30 - Sept 5)
+Note that the current version has a bug with the way enemy1 attempts to predict the player movement when launching an attack. 
 <details>
     <summary>Misc</summary>
 
