@@ -29,13 +29,20 @@ public class enemy1_control : MonoBehaviour
     public float attackCooldown = 3f;
     public float attackDamage = 20f;
     public float attackForeswing = 0.7f;
+    public float attackBackswing = 0.5f;
+    public float attackRange = 2.5f;
     public GameObject telegraphPrefab;              // telegraph for the attack AoE
+    public GameObject attackPrefab;
     private SpriteRenderer telegraphFlash;          // telegraph for the attack timing flash
     private Parryable parryWindow;
     private Coroutine telegraphCoroutine;
+    private Coroutine brakeCoroutine;
     private GameObject activeTelegraph;
+    private GameObject attack;
     private Vector2 aimDirection;
     private float aimLockTime = 0.3f;       // how long before the enemy attack should their aim be locked for
+    private Vector2 attackStartPos;         // start pos of attack, brake after traveling attackRange distance
+    private Vector2 futurePos;              // predicted player future location
 
     private float cooldownTimer = 0;
     private float foreswingTimer;
@@ -47,22 +54,33 @@ public class enemy1_control : MonoBehaviour
     private Vector2 direction;
     private float activationRange = 5f;
     private bool initialContact = true;
-    private bool PlayerTooFar => distance > 2f;
+    private bool PlayerTooFar => distance > attackRange * 0.9f;
     private bool PlayerTooClose => distance < 1f;
     private bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
     private bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
 
     private Rigidbody2D body;
-    private Transform player;
+    private Transform playerTransform;
+    private Rigidbody2D playerBody;
+    private Hurtbox hurtbox;
+    private SpriteRenderer sprite;
 
+    void Awake()
+    {
+        hurtbox = GetComponentInChildren<Hurtbox>();
+        hurtbox.maxHealth = health;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // gameobject init
         body = GetComponent<Rigidbody2D>();
-        player = GameObject.FindWithTag("Player").transform;
+        playerTransform = GameObject.FindWithTag("Player").transform;
+        playerBody = playerTransform.GetComponent<Rigidbody2D>();
         telegraphFlash = transform.Find("telegraph_0").GetComponent<SpriteRenderer>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
+        
         parryWindow = GetComponent<Parryable>();
 
         // behaviour init
@@ -81,8 +99,8 @@ public class enemy1_control : MonoBehaviour
         // StateMachine();
 
         // Vector2 direction = ((Vector2)player.position - (Vector2)transform.position).normalized;
-        distance = Vector2.Distance((Vector2)player.position, (Vector2)transform.position);
-        direction = ((Vector2)player.position - (Vector2)transform.position).normalized;
+        distance = Vector2.Distance((Vector2)playerTransform.position, (Vector2)transform.position);
+        direction = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
         UpdateState();  
         // Debug.Log("Parryable: " + parryWindow.isParryable);
     }
@@ -187,7 +205,8 @@ public class enemy1_control : MonoBehaviour
     // update while in Attacking state
     void UpdateAttacking()
     {
-        if (scared) { EnterRetreating(); return;}
+        if (scared) { EnterRetreating(); return; }
+        // else { EnterIdle(); return; }
     }
 
     // update while in Retreating state
@@ -206,6 +225,12 @@ public class enemy1_control : MonoBehaviour
         state = EnemyState.Idle;
         idleTimer = Random.Range(minIdleTime, maxIdleTime);
         scared = false;
+
+        if (brakeCoroutine != null)
+        {
+            StopCoroutine(brakeCoroutine);
+            brakeCoroutine = null;
+        }
     }
 
     // Retreat if scared
@@ -291,7 +316,7 @@ public class enemy1_control : MonoBehaviour
     void Attack()
     {
         // if player moves out of range, clean up
-        if (distance > 2.5f && foreswingTimer > aimLockTime) 
+        if (distance > attackRange && foreswingTimer > aimLockTime) 
         {
             state = EnemyState.Idle; 
             body.bodyType = RigidbodyType2D.Dynamic;
@@ -309,16 +334,22 @@ public class enemy1_control : MonoBehaviour
                 Destroy(activeTelegraph);
                 activeTelegraph = null;
             }
+
+            if (brakeCoroutine != null)
+            {
+                StopCoroutine(brakeCoroutine);
+                brakeCoroutine = null;
+            }
             
             return; 
         }
 
         // attack sequence
-        if (body.linearVelocity.magnitude > 0.5)    // slow down before attacking
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 5);
-        }
-        else if (foreswingTimer > 0)    // attack telegraph, etc.
+        // if (body.linearVelocity.magnitude > 0.5)    // slow down before attacking
+        // {
+        //     body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 5);
+        // }
+        if (foreswingTimer > 0)    // attack telegraph, etc.
         {
             if (telegraphCoroutine == null)
             {
@@ -331,24 +362,40 @@ public class enemy1_control : MonoBehaviour
             }
             else
             {
+                // predict player's future location
+                futurePos = ((Vector2)playerTransform.position + playerBody.linearVelocity) * aimLockTime * 0.5f;
+                aimDirection = (futurePos - (Vector2)transform.position).normalized;
+
                 telegraphFlash.color = new Color(1f, 0f, 0f, foreswingTimer / aimLockTime);
                 telegraphFlash.transform.localScale = telegraphFlash.transform.localScale * 0.99f;
                 parryWindow.isParryable = true;
                 
             }
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 3);
+            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 5);
         }
         else
         {
+            attackStartPos = body.position;                                 // get the attack starting pos
             body.bodyType = RigidbodyType2D.Dynamic;                        // kinematic --> dynamic
             telegraphFlash.color = new Color(1f, 0f, 0f, 0f);               // make the flash invisible again
             telegraphFlash.transform.localScale = new Vector3(1f, 1f, 1f);  // idk
-            body.AddForce(aimDirection * 25f, ForceMode2D.Impulse);         // enemy ram attack
+            attack = Instantiate(attackPrefab, transform.position, transform.rotation, transform);
+            Hitbox hitbox = attack.GetComponentInChildren<Hitbox>();        // get the attack's hitbox
+            hitbox.attackerHurtbox = GetComponentInChildren<Hurtbox>();     // get the attacker's hurtbox
+            Destroy(attack, 0.2f);
+            body.AddForce(aimDirection * 36f, ForceMode2D.Impulse);         // enemy ram attack
             circleTimer = Random.Range(minCircleTime, maxCircleTime);       // set timer
             cooldownTimer = attackCooldown;                                 // set timer
             foreswingTimer = attackForeswing;                               // reset foreswing
+            futurePos = Vector2.zero;
+
+            // after travelling attackRange distance, damp strongly
+            if (brakeCoroutine == null)
+            {
+                brakeCoroutine = StartCoroutine(Brake());
+            }
             scared = true;  
-            scaredTimer = 1f;
+            scaredTimer = attackBackswing;
         }
 
         // Debug.Log("Attacking");
@@ -359,39 +406,57 @@ public class enemy1_control : MonoBehaviour
     {
         
         // aim telegraph toward player
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0f, 0f, angle - 90f);
 
-        activeTelegraph = Instantiate(telegraphPrefab, transform.position, rotation);
+        activeTelegraph = Instantiate(telegraphPrefab, transform.position, rotation, transform);
         AttackTelegraph telegraph = activeTelegraph.GetComponent<AttackTelegraph>();
         telegraph.duration = foreswingTimer;
-        telegraph.size = new Vector2(0.3f, 2.5f);
+        telegraph.size = new Vector2(0.3f, attackRange);
         telegraph.lockTime = aimLockTime;
-        telegraph.Init(transform, player);
+        telegraph.Init(transform, playerTransform);
 
-        yield return new WaitForSeconds(foreswingTimer);
+        // while (foreswingTimer >= 0)
+        // {
+        //     telegraph.SetTargetOverride(futurePos);
+        //     yield return null;
+        // }
+        yield return new WaitForSeconds(foreswingTimer - aimLockTime);
+        telegraph.SetTargetOverride(futurePos);
+        yield return new WaitForSeconds(aimLockTime);
 
         Destroy(activeTelegraph);
         telegraphCoroutine = null;
     }
 
-    // if just attacked or took significant damage, retreat a short distance
+    // if just attacked or got parried, lerp to zero ("stun")
     void Retreat()
     {
-        if (body.linearVelocity.magnitude > 1f && scaredTimer <= 0.8f)
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, body.linearVelocity.normalized, damping * 5f);
-        }
-        else { parryWindow.isParryable = false; }
-        
-        body.AddForce(-direction * accel * 0.5f, ForceMode2D.Force);
-        if (body.linearVelocity.magnitude > moveSpeed)
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
-        }
+        // body.AddForce(-direction * accel * 0.5f, ForceMode2D.Force);
+        // if (body.linearVelocity.magnitude > moveSpeed)
+        // {
+        body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 2f);
+        // }
         scaredTimer -= Time.deltaTime;
 
         // Debug.Log("Retreating: " + scaredTimer.ToString());
+    }
+
+    IEnumerator Brake()
+    {
+        // wait until enemy has traveled far enough
+        while ((body.position - attackStartPos).magnitude < attackRange)
+            yield return new WaitForFixedUpdate();
+
+        // now brake
+        parryWindow.isParryable = false;
+        Destroy(attack);
+
+        while (body.linearVelocity.magnitude > 0.1f)
+        {
+            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping * 5f);
+            yield return new WaitForFixedUpdate();
+        }
     }
 
 
@@ -402,7 +467,9 @@ public class enemy1_control : MonoBehaviour
 
     void OnParried()
     {
+        // variable cleanup
         // "stun" enemy and set to scared
+        body.linearVelocity = new Vector2(0f, 0f);
         StopAllCoroutines();
         parryWindow.isParryable = false;
         state = EnemyState.Retreating; 
@@ -413,7 +480,7 @@ public class enemy1_control : MonoBehaviour
         telegraphFlash.transform.localScale = new Vector3(1f, 1f, 1f);  // idk
         circleTimer = Random.Range(minCircleTime, maxCircleTime);       // set timer
         scared = true;  
-        scaredTimer = 1f;
+        scaredTimer = attackBackswing;
 
         if (telegraphCoroutine != null)     // if telegraph coroutine started, stop it
         {
@@ -427,20 +494,52 @@ public class enemy1_control : MonoBehaviour
             activeTelegraph = null;
         }
 
-        // hitstp
-        StartCoroutine(ParryHitstop());
-    }
-
-    IEnumerator ParryHitstop()
-    {
-        Time.timeScale = 0f;
-        yield return new WaitForSecondsRealtime(0.5f);
-        Time.timeScale = 1f;
+        if (brakeCoroutine != null)
+        {
+            StopCoroutine(brakeCoroutine);
+            brakeCoroutine = null;
+        }
     }
 
     void Die()
     {
+        sprite.enabled = false;     // make invisible
+        // disable colliders
+        foreach (Collider2D col in GetComponentsInChildren<Collider2D>())
+            col.enabled = false;
+
+        StopAllCoroutines();
+        parryWindow.isParryable = false;
+        
+        telegraphFlash.color = new Color(1f, 0f, 0f, 0f);               // make the flash invisible again
+        telegraphFlash.transform.localScale = new Vector3(1f, 1f, 1f);  // idk
+
+        if (telegraphCoroutine != null)     // if telegraph coroutine started, stop it
+        {
+            // StopCoroutine(telegraphCoroutine);
+            telegraphCoroutine = null;
+        }
+
+        if (activeTelegraph != null)        // if the telegraph sprite is active, destroy it
+        {
+            Destroy(activeTelegraph);
+            activeTelegraph = null;
+        }
+
+        if (brakeCoroutine != null)
+        {
+            // StopCoroutine(brakeCoroutine);
+            brakeCoroutine = null;
+        }
+
         // death particle effect here
+        Destroy(gameObject, 0.5f);
+        // StartCoroutine(died());
+    }
+
+    IEnumerator died()
+    {
+        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
 

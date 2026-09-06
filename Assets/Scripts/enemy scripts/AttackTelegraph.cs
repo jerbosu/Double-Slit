@@ -12,6 +12,7 @@ public class AttackTelegraph : MonoBehaviour
     private Transform enemy;
     private Transform player;
     private bool locked = false;
+    private Vector2? targetOverride = null;
 
     private static Sprite _defaultSprite;
 
@@ -53,10 +54,17 @@ public class AttackTelegraph : MonoBehaviour
     {
         if (enemy == null || player == null) return;
 
+        Vector2 target = targetOverride ?? (Vector2)player.position;
+
         transform.position = enemy.position;
-        Vector2 direction = ((Vector2)player.position - (Vector2)enemy.position).normalized;
+        Vector2 direction = (target - (Vector2)enemy.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle - 90f);
+    }
+
+    public void SetTargetOverride(Vector2 target)
+    {
+        targetOverride = target;
     }
 
     void Update()

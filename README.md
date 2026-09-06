@@ -161,11 +161,15 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
     - [x] Particles on hit (speed scales with damage)
     - [x] Flash on hit
 - [x] Animate heavy attack hitbox
+    - [ ] Either increase accuracy of the animation or change heavy attack to match the animation
 - [x] Hurtbox/collider correction
     - Capsule colliders can only extend along one axis. Matched that axis with the squash/stretch axis for the two gameobjects currently using them. 
 - [x] Hitbox correction
     - Sometimes the knockback from an attack could cause an enemy to enter, exit, then enter the attack hitbox again, dealing multiple instances of knockback and damage
     - Fixed by storing and checking if an entity has already been hit by an attack instance
+- [ ] Have UI show on top of gameobjects
+- [x] Change enemy1 attack range to be distance based rather than time based. Very silly error.
+    - Telegraph prefab and hitbox are now also distance rather than time based.
 
 </details>
 
@@ -177,16 +181,34 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
         - Requires significant tweaking to "feel" correct
         - Current knockback is based on player and enemy position, not attack direction. Maybe change later
     - [ ] Particle effect on death (direction, velocity...)
-- [ ] Attack hitbox
+        - Currently uses onHit particle effect
+    - [x] Fixed bug where attack telegraph would remain after death
+        - By setting the enemy as the telegraph's parent, it would be destroyed with the enemy on death
+
+- [x] Attack hitbox
     - [ ] Physics interaction on hitting the player
+    - [ ] Player health, respawn mechanics
+    - [x] Player recovers hp upon hitting the enemy
 
 - [x] Parrying!!!!
     - [x] General parry script (so enemies can parry as well)
     - [x] Enemy parry window
+        - [x] Fixed a bug where parrying wouldn't deal damage or knockback
     - [x] Hitstop on parry
-        - [ ] Fix player heavy attack indicator not working despite using unscaled time?
-    
+        - [x] Fix player heavy attack indicator not working despite using unscaled time
+            - Solution: the particle system used as indicator was set to scaled time.
+    - [x] Screen flash on parry
+        - The ScreenFlash class can also be used to indicate other effects like damage taken, etc 
 
+- [x] Minor enemy1 behaviour changes
+    - Much more aggressive, circles and idles for less time
+    - Increased attack range
+    - Slower "bounce back" after a parry
+    - [x] Attempted to add player movement prediction
+    
+- [x] Enemy spawning script
+    - Currently spawns at a set interval for easier testing
+    - [x] Make enemy1 into a prefab
 
 - [ ] Basic pathfinding?
 

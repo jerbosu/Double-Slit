@@ -26,7 +26,6 @@ public class Hurtbox : MonoBehaviour
     {
         health = maxHealth;
         parent = GetComponentInParent<Rigidbody2D>();
-        // SetupFlashOverlay();
     }
 
 
@@ -43,7 +42,7 @@ public class Hurtbox : MonoBehaviour
         health -= amount;
         parent.AddForce(knockback, ForceMode2D.Impulse);
 
-        StartCoroutine(Flash());
+        if (flashOverlay != null) { StartCoroutine(Flash()); }
 
         if (hitParticles != null)
         {
@@ -64,24 +63,16 @@ public class Hurtbox : MonoBehaviour
         if (health <= 0)
         {
             onDeath?.Invoke();
+            health = 0;
         }
     }
 
-    void SetupFlashOverlay()
+    public void Heal(float amount)
     {
-        SpriteRenderer parentSr = GetComponentInParent<SpriteRenderer>();
-        if (parentSr == null) return;
-
-        GameObject overlayObj = new GameObject("HitFlash");
-        overlayObj.transform.SetParent(parentSr.transform);
-        overlayObj.transform.localPosition = Vector3.zero;
-        overlayObj.transform.localScale = Vector3.one;
-
-        flashOverlay = overlayObj.AddComponent<SpriteRenderer>();
-        flashOverlay.sprite = parentSr.sprite;
-        flashOverlay.color = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
-        flashOverlay.sortingOrder = parentSr.sortingOrder + 1;
+        health = Mathf.Min(health + amount, maxHealth);
+        // Debug.Log("Healed " + amount);
     }
+
 
     IEnumerator Flash()
     {

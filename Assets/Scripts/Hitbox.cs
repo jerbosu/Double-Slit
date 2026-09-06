@@ -6,8 +6,11 @@ public class Hitbox : MonoBehaviour
     // drag + drop these into an attack prefab and customize in inspector
     public float damage = 10f;
     public float knockbackForce = 10f;
+    public float healOnHit = 5f;
 
     public bool isParryAttack = false;     // use to classify if player/enemy uses a parry attack/stance
+
+    [HideInInspector] public Hurtbox attackerHurtbox;
 
     private CapsuleCollider2D col;
     private Rigidbody2D parent;
@@ -15,12 +18,8 @@ public class Hitbox : MonoBehaviour
 
     void Awake()
     {
-        col = GetComponent<CapsuleCollider2D>();    // get the collider
-    }
-
-    void Start()
-    {
-        parent = GetComponentInParent<Rigidbody2D>();
+        col = GetComponent<CapsuleCollider2D>();            // get the collider
+        parent = GetComponentInParent<Rigidbody2D>();       // get attacker rigidbody2d
     }
 
 
@@ -32,7 +31,7 @@ public class Hitbox : MonoBehaviour
 
 
 
-    // for if an attack hitbox changes over the attack duration (i.e. heavy attack)
+    // for animating hitboxes (i.e. heavy attack)
     public void SetShape(Vector2 size, Vector2 offset)
     {
         col.size = size;
@@ -43,21 +42,26 @@ public class Hitbox : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         Hurtbox hurtbox = other.GetComponent<Hurtbox>();    // get the hurtbox of the colliding gameobject
-        if (hurtbox == null) return;                // error handling idk
-        if (alreadyHit.Contains(hurtbox)) return;   // this hitbox instance has already hit this target
-        alreadyHit.Add(hurtbox);                    // else, add to hit targets
+        if (hurtbox == null) return;                        // error handling idk
+        if (alreadyHit.Contains(hurtbox)) return;           // this hitbox instance has already hit this target
+        alreadyHit.Add(hurtbox);                            // else, add to hit targets
+        float tempDamage = damage;
 
         Parryable parryable = hurtbox.GetComponentInParent<Parryable>();
         if (isParryAttack && parryable != null && parryable.isParryable)
         {
             parryable.Parry();
-            return;
+            tempDamage = damage * 2;        // if successful parry, double damage
+            healOnHit = 100;
+            // return;
         }
 
         // knockback force calc
         Vector2 knockback = (other.transform.position - transform.position).normalized * knockbackForce;
         parent.AddForce(-knockback * 0.5f, ForceMode2D.Impulse);    // knockback on attacking entity
-        hurtbox.TakeDamage(damage, knockback);                      // knockback on attacked entity
+        hurtbox.TakeDamage(tempDamage, knockback);                      // knockback on attacked entity
         
+        if (attackerHurtbox != null)
+            attackerHurtbox.Heal(healOnHit);
     }
 }

@@ -21,7 +21,7 @@ public class character_movement : MonoBehaviour
     [Header("Physics")]
     private const float ACCEL = 50f;        // how fast to speed up (uses addForce so is bigger)
     private const float DAMPING = 5f;     // how fast to slow down (uses lerp so smaller)
-    private const float runSpeed = 2f;        // base movement speed
+    private const float runSpeed = 1.5f;        // base movement speed
     private ParticleSystem moveParticles;
 
     [Header("Light Attack")]
@@ -336,6 +336,8 @@ public class character_movement : MonoBehaviour
         // set the slash position
         GameObject slash = Instantiate(lightAttack_prefab, transform.position, aimAngleEuler, transform);
         slash.GetComponent<slash_prefab>().Init(transform);
+        Hitbox hitbox = slash.GetComponentInChildren<Hitbox>();        // get the attack's hitbox
+        hitbox.attackerHurtbox = GetComponentInChildren<Hurtbox>();     // get the attacker's hurtbox
 
         if (mirror)
         {
@@ -380,13 +382,15 @@ public class character_movement : MonoBehaviour
         GameObject heavyAttack = Instantiate(heavyAttack_prefab, transform.position, aimAngleEuler);
         Hitbox hitbox = heavyAttack.GetComponentInChildren<Hitbox>();
         hitbox.isParryAttack = true;
+        hitbox.attackerHurtbox = GetComponentInChildren<Hurtbox>();     // get the attacker's hurtbox
+
         Rigidbody2D spawnedBody = heavyAttack.GetComponent<Rigidbody2D>();
         if (spawnedBody != null) {
             spawnedBody.linearVelocity = body.linearVelocity;   // inherit player velocity
         }
         heavyAttack.transform.localScale = new Vector3(4f, 2f, 1f);
 
-        if (hitbox != null) StartCoroutine(AnimateHitbox(hitbox, 0.3f));
+        if (hitbox != null) StartCoroutine(AnimateHitbox(hitbox, 0.25f));
 
         body.AddForce(((Vector2)transform.position - mouseWorldPos) * recoil, ForceMode2D.Impulse);
 
