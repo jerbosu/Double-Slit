@@ -41,6 +41,7 @@ public class enemy1_control : MonoBehaviour
     private GameObject attack;
     private Vector2 aimDirection;
     private float aimLockTime = 0.3f;       // how long before the enemy attack should their aim be locked for
+    private bool aimLocked = false;         // whether enemy aim is locked
     private Vector2 attackStartPos;         // start pos of attack, brake after traveling attackRange distance
     private Vector2 futurePos;              // predicted player future location
 
@@ -356,16 +357,19 @@ public class enemy1_control : MonoBehaviour
                 telegraphCoroutine = StartCoroutine(TelegraphAoE());
             }
             foreswingTimer -= Time.deltaTime;
-            if (foreswingTimer > aimLockTime)  // freeze aim direction 0.5 seconds before attacking
+            if (foreswingTimer > aimLockTime)  // freeze aim direction aimLockTime seconds before attacking
             {
-                aimDirection = direction;
+                // predict player's future location
+                futurePos = (Vector2)playerTransform.position + playerBody.linearVelocity * aimLockTime;
             }
             else
             {
-                // predict player's future location
-                futurePos = ((Vector2)playerTransform.position + playerBody.linearVelocity) * aimLockTime * 0.5f;
-                aimDirection = (futurePos - (Vector2)transform.position).normalized;
-
+                // aimDirection = (futurePos - (Vector2)transform.position).normalized;
+                if (aimLocked == false)
+                {
+                    aimDirection = (futurePos - (Vector2)transform.position).normalized;
+                    aimLocked = true;
+                }
                 telegraphFlash.color = new Color(1f, 0f, 0f, foreswingTimer / aimLockTime);
                 telegraphFlash.transform.localScale = telegraphFlash.transform.localScale * 0.99f;
                 parryWindow.isParryable = true;
@@ -387,7 +391,8 @@ public class enemy1_control : MonoBehaviour
             circleTimer = Random.Range(minCircleTime, maxCircleTime);       // set timer
             cooldownTimer = attackCooldown;                                 // set timer
             foreswingTimer = attackForeswing;                               // reset foreswing
-            futurePos = Vector2.zero;
+            aimLocked = false;
+            // futurePos = Vector2.zero;
 
             // after travelling attackRange distance, damp strongly
             if (brakeCoroutine == null)
@@ -416,13 +421,17 @@ public class enemy1_control : MonoBehaviour
         telegraph.lockTime = aimLockTime;
         telegraph.Init(transform, playerTransform);
 
-        // while (foreswingTimer >= 0)
-        // {
-        //     telegraph.SetTargetOverride(futurePos);
-        //     yield return null;
-        // }
-        yield return new WaitForSeconds(foreswingTimer - aimLockTime);
-        telegraph.SetTargetOverride(futurePos);
+
+
+        while (aimLocked == false)
+        {
+            telegraph.SetTargetOverride(futurePos);
+            yield return null;
+        }
+        // yield return new WaitForSeconds(foreswingTimer - aimLockTime - 0.05f);
+
+        // telegraph.SetTargetOverride(futurePos);
+
         yield return new WaitForSeconds(aimLockTime);
 
         Destroy(activeTelegraph);

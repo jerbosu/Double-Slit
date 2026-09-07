@@ -90,7 +90,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 <details> 
     <summary>First enemy</summary>
 
-- [ ] Enemy visuals
+- [x] Enemy visuals
     - [x] Sprite
     - [x] Squash/stretch (very easy now that squash/stretch is its own script)
     - [ ] Attack indicator
@@ -181,7 +181,7 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
     - [x] Physics interaction after getting hit by the player (i.e. slight knockback for light attack)
         - Requires significant tweaking to "feel" correct
         - Current knockback is based on player and enemy position, not attack direction. Maybe change later
-    - [ ] Particle effect on death (direction, velocity...)
+    - [x] Particle effect on death (direction, velocity...)
         - Currently uses onHit particle effect
     - [x] Fixed bug where attack telegraph would remain after death
         - By setting the enemy as the telegraph's parent, it would be destroyed with the enemy on death
@@ -212,5 +212,24 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
     - [x] Make enemy1 into a prefab
 
 - [ ] Basic pathfinding?
+
+</details>
+
+### Week 6 (Sept 6 - 12)
+
+<details>
+    <summary>Misc</summary>
+
+- [x] Fixed enemy1 telegraph behaviour
+
+</details>
+
+<details>
+    <summary>Enemy 2</summary>
+
+- Will be a ranged enemy
+- [ ] Enemy2 visuals
+    - [ ] Sprite
+    - [ ] Projectile
 
 </details>

@@ -38,7 +38,7 @@ public class AttackTelegraph : MonoBehaviour
         float trackDuration = duration - lockTime;
 
         // track player for most of the windup
-        while (elapsed < trackDuration)
+        while (elapsed <= trackDuration)
         {
             AimAtPlayer();
             elapsed += Time.deltaTime;
