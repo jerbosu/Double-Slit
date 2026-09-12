@@ -221,6 +221,23 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
     <summary>Misc</summary>
 
 - [x] Fixed enemy1 telegraph behaviour
+- [ ] Telegraph still sometimes finishes playing even if enemy dies, fix
+
+</details>
+
+<details>
+    <summary>Major Code Refactor</summary>
+
+- [ ] Clean up enemy1 code
+    - [ ] Idle state seems slightly redundant/not serving its intended purpose
+        - Wanted it as a "watching the player" state, cancelled upon player getting to close
+- [ ] Extract from enemy1 controller code a "base enemy" class for reusability
+    - [ ] Stats?
+    - [ ] Behaviour (state machine)?
+        - [x] Moved Idle, TooFar, TooClose to BaseEnemy
+        - [ ] Add Circling (melee enemies only) and Aiming (ranged enemies only)
+            - Maybe make Aiming part of attack foreswing?
+    - [ ] Switch enemy1 over to BaseEnemy
 
 </details>
 

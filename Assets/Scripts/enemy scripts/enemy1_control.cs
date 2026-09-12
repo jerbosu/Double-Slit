@@ -170,7 +170,7 @@ public class enemy1_control : MonoBehaviour
         // if idleTimer not over yet keep idling unless player is too close
         if (idleTimer > 0f && distance > activationRange) return;
 
-        // if idleTimer ended change behaviour
+        // if idleTimer ended or player too close change behaviour
         idleTimer = 0f;
         if (scared)         { EnterRetreating(); return; }
         if (PlayerTooFar)   { state = EnemyState.TooFar; return; }
