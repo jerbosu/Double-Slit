@@ -222,6 +222,7 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
 
 - [x] Fixed enemy1 telegraph behaviour
 - [ ] Telegraph still sometimes finishes playing even if enemy dies, fix
+- [x] Edit to main branch, separate from BaseEnemy branch. For experimenting with merge conflict resolution.  
 
 </details>
 
