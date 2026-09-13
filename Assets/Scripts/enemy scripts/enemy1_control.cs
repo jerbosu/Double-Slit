@@ -1,36 +1,36 @@
 using UnityEngine;
 using System.Collections;
 
-public class enemy1_control : MonoBehaviour
+public class enemy1_control : BaseEnemy
 {
     /* VARIABLES */
-    [Header("Stats")]
-    public float health = 10f;
-    private bool scared = false;
-    private float scaredTimer = 0;
+    // [Header("Stats")]
+    // public float health = 10f;
+    // private bool scared = false;
+    // private float scaredTimer = 0;
 
-    [Header("Timers")]
-    public float minCircleTime = 1f;
-    public float maxCircleTime = 3f;
-    public float minIdleTime = 1f;
-    public float maxIdleTime = 3f;
+    // [Header("Timers")]
+    // public float minCircleTime = 1f;
+    // public float maxCircleTime = 3f;
+    // public float minIdleTime = 1f;
+    // public float maxIdleTime = 3f;
     
-    private float circleDirection; 
-    private float circleTimer;
-    private float idleTimer;
-    private Vector2 idleDir;
+    // private float circleDirection; 
+    // private float circleTimer;
+    // private float idleTimer;
+    // private Vector2 idleDir;
 
-    [Header("Movement")]
-    public float moveSpeed = 3f;
-    public float accel = 10f;
-    public float damping = 1f;
+    // [Header("Movement")]
+    // public float moveSpeed = 3f;
+    // public float accel = 10f;
+    // public float damping = 1f;
 
     [Header("Attack")]
-    public float attackCooldown = 3f;
-    public float attackDamage = 20f;
-    public float attackForeswing = 0.7f;
-    public float attackBackswing = 0.5f;
-    public float attackRange = 2.5f;
+    // public float attackCooldown = 3f;
+    // public float attackDamage = 20f;
+    // public float attackForeswing = 0.7f;
+    // public float attackBackswing = 0.5f;
+    // public float attackRange = 2.5f;
     public GameObject telegraphPrefab;              // telegraph for the attack AoE
     public GameObject attackPrefab;
     private SpriteRenderer telegraphFlash;          // telegraph for the attack timing flash
@@ -45,23 +45,23 @@ public class enemy1_control : MonoBehaviour
     private Vector2 attackStartPos;         // start pos of attack, brake after traveling attackRange distance
     private Vector2 futurePos;              // predicted player future location
 
-    private float cooldownTimer = 0;
+    // private float cooldownTimer = 0;
     private float foreswingTimer;
 
     /* STATE MACHINE VARIABLES */
-    private enum EnemyState {TooFar, TooClose, Idle, Circling, Attacking, Retreating}
-    private EnemyState state = EnemyState.Idle;
-    private float distance = Mathf.Infinity;
-    private Vector2 direction;
-    private float activationRange = 5f;
-    private bool initialContact = true;
-    private bool PlayerTooFar => distance > attackRange * 0.9f;
-    private bool PlayerTooClose => distance < 1f;
-    private bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
-    private bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
+    // private enum EnemyState {TooFar, TooClose, Idle, Circling, Attacking, Retreating}
+    // private EnemyState state = EnemyState.Idle;
+    // private float distance = Mathf.Infinity;
+    // private Vector2 direction;
+    // private float activationRange = 5f;
+    // private bool initialContact = true;
+    // private bool PlayerTooFar => distance > attackRange * 0.9f;
+    // private bool PlayerTooClose => distance < 1f;
+    // private bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
+    // private bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
 
-    private Rigidbody2D body;
-    private Transform playerTransform;
+    // private Rigidbody2D body;
+    // private Transform playerTransform;
     private Rigidbody2D playerBody;
     private Hurtbox hurtbox;
     private SpriteRenderer sprite;
@@ -73,11 +73,14 @@ public class enemy1_control : MonoBehaviour
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    protected override void Start()
     {
+        // BaseEnemy init
+        base.Start();
         // gameobject init
-        body = GetComponent<Rigidbody2D>();
-        playerTransform = GameObject.FindWithTag("Player").transform;
+            // first two are in BaseEnemy
+        // body = GetComponent<Rigidbody2D>();
+        // playerTransform = GameObject.FindWithTag("Player").transform;
         playerBody = playerTransform.GetComponent<Rigidbody2D>();
         telegraphFlash = transform.Find("telegraph_0").GetComponent<SpriteRenderer>();
         sprite = GetComponentInChildren<SpriteRenderer>();
@@ -95,18 +98,15 @@ public class enemy1_control : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-        // StateMachine();
+        base.Update();  // calculates distance and direction
 
-        // Vector2 direction = ((Vector2)player.position - (Vector2)transform.position).normalized;
-        distance = Vector2.Distance((Vector2)playerTransform.position, (Vector2)transform.position);
-        direction = ((Vector2)playerTransform.position - (Vector2)transform.position).normalized;
-        UpdateState();  
+        // UpdateState();
         // Debug.Log("Parryable: " + parryWindow.isParryable);
     }
 
-    void FixedUpdate()
+    protected override void FixedUpdate()
     {
         
         cooldownTimer -= Time.deltaTime;
@@ -124,7 +124,7 @@ public class enemy1_control : MonoBehaviour
                 TooClose();
                 break;
             case EnemyState.Circling:
-                Circle();
+                Circle(1);
                 break;
             case EnemyState.Attacking:
                 body.bodyType = RigidbodyType2D.Kinematic;
@@ -147,85 +147,86 @@ public class enemy1_control : MonoBehaviour
 
     /* STATE UPDATE FUNCTIONS */
     // call the update functions
-    void UpdateState()
-    {
-        switch (state)
-        {
-            case EnemyState.Idle:       UpdateIdle();       break;
-            case EnemyState.TooFar:     UpdateTooFar();     break;
-            case EnemyState.TooClose:   UpdateTooClose();   break;
-            case EnemyState.Circling:   UpdateCircling();   break;
-            case EnemyState.Attacking:  UpdateAttacking();  break;
-            case EnemyState.Retreating: UpdateRetreating(); break;
-        }
-    }
+    // void UpdateState()
+    // {
+    //     switch (state)
+    //     {
+    //         case EnemyState.Idle:       UpdateIdle();       break;
+    //         case EnemyState.TooFar:     UpdateTooFar();     break;
+    //         case EnemyState.TooClose:   UpdateTooClose();   break;
+    //         case EnemyState.Circling:   UpdateCircling();   break;
+    //         case EnemyState.Attacking:  UpdateAttacking();  break;
+    //         case EnemyState.Retreating: UpdateRetreating(); break;
+    //     }
+    // }
 
     // update while in Idle state
-    void UpdateIdle()
-    {
-        // idle until player gets close, then follow player forever
-        if (distance > activationRange && initialContact == true) return;
-        initialContact = false;
-        idleTimer -= Time.deltaTime;
-        // if idleTimer not over yet keep idling unless player is too close
-        if (idleTimer > 0f && distance > activationRange) return;
+    // void UpdateIdle()
+    // {
+    //     // idle until player gets close, then follow player forever
+    //     if (distance > activationRange && initialContact == true) return;
+    //     initialContact = false;
+    //     idleTimer -= Time.deltaTime;
+    //     // if idleTimer not over yet keep idling unless player is too close
+    //     if (idleTimer > 0f && distance > activationRange) return;
 
-        // if idleTimer ended or player too close change behaviour
-        idleTimer = 0f;
-        if (scared)         { EnterRetreating(); return; }
-        if (PlayerTooFar)   { state = EnemyState.TooFar; return; }
-        if (PlayerTooClose) { state = EnemyState.TooClose; return; }
-        // if all of the above are false, begin circling
-        state = EnemyState.Circling;
-    }
+    //     // if idleTimer ended or player too close change behaviour
+    //     idleTimer = 0f;
+    //     if (scared)         { EnterRetreating(); return; }
+    //     if (PlayerTooFar)   { state = EnemyState.TooFar; return; }
+    //     if (PlayerTooClose) { state = EnemyState.TooClose; return; }
+    //     // if all of the above are false, begin circling
+    //     state = EnemyState.Circling;
+    // }
 
     // update while in TooFar state
-    void UpdateTooFar()
-    {
-        if (!PlayerTooFar) state = EnemyState.Idle;
-    }
+    // void UpdateTooFar()
+    // {
+    //     if (!PlayerTooFar) state = EnemyState.Idle;
+    // }
 
     // update while in TooClose state
-    void UpdateTooClose()
-    {
-        circleTimer -= Time.deltaTime;
-        if (ReadyToAttack) {state = EnemyState.Attacking; return;}
-        if (!PlayerTooClose) state = EnemyState.Idle;
-    }
+    // void UpdateTooClose()
+    // {
+    //     circleTimer -= Time.deltaTime;
+    //     if (ReadyToAttack) {state = EnemyState.Attacking; return;}
+    //     if (!PlayerTooClose) state = EnemyState.Idle;
+    // }
 
     // update while in Circling state
-    void UpdateCircling()
-    {
-        if (scared)         { EnterRetreating(); return; }
-        if (!PlayerInRange) { state = EnemyState.Idle; return; }
+    // void UpdateCircling()
+    // {
+    //     if (scared)         { EnterRetreating(); return; }
+    //     if (!PlayerInRange) { state = EnemyState.Idle; return; }
 
-        circleTimer -= Time.deltaTime;
-        if (ReadyToAttack) state = EnemyState.Attacking;
-    }
+    //     circleTimer -= Time.deltaTime;
+    //     if (ReadyToAttack) state = EnemyState.Attacking;
+    // }
 
     // update while in Attacking state
-    void UpdateAttacking()
-    {
-        if (scared) { EnterRetreating(); return; }
-        // else { EnterIdle(); return; }
-    }
+    // void UpdateAttacking()
+    // {
+    //     if (scared) { EnterRetreating(); return; }
+    //     // else { EnterIdle(); return; }
+    // }
 
     // update while in Retreating state
-    void UpdateRetreating()
-    {
-        scaredTimer -= Time.deltaTime;
-        if (scaredTimer <= 0) EnterIdle();
-    }
+    // void UpdateRetreating()
+    // {
+    //     scaredTimer -= Time.deltaTime;
+    //     if (scaredTimer <= 0) EnterIdle();
+    // }
 
 
 
     /* STATE TRANSITION FUNCTIONS */
     // Idle is the base state, every other state can be reached from it
-    void EnterIdle()
+    protected override void EnterIdle()
     {
-        state = EnemyState.Idle;
-        idleTimer = Random.Range(minIdleTime, maxIdleTime);
-        scared = false;
+        // state = EnemyState.Idle;
+        // idleTimer = Random.Range(minIdleTime, maxIdleTime);
+        // scared = false;
+        base.EnterIdle();
 
         if (brakeCoroutine != null)
         {
@@ -235,63 +236,63 @@ public class enemy1_control : MonoBehaviour
     }
 
     // Retreat if scared
-    void EnterRetreating()
-    {
-        state = EnemyState.Retreating;
-    }
+    // void EnterRetreating()
+    // {
+    //     state = EnemyState.Retreating;
+    // }
 
 
 
     /* STATE BEHAVIOUR FUNCTIONS */
     // observe the player
-    void Idle()
-    {
-        if (initialContact == true)
-        {
-            idleDir = Random.insideUnitCircle.normalized;
-        }
-        else
-        {
-            idleDir = Quaternion.Euler(0f, 0f, Random.Range(-90f, 90f)) * direction;
-        }
+    // void Idle()
+    // {
+    //     if (initialContact == true)
+    //     {
+    //         idleDir = Random.insideUnitCircle.normalized;
+    //     }
+    //     else
+    //     {
+    //         idleDir = Quaternion.Euler(0f, 0f, Random.Range(-90f, 90f)) * direction;
+    //     }
         
-        body.AddForce(0.5f * accel * idleDir, ForceMode2D.Force);
-        if (body.linearVelocity.magnitude > moveSpeed)
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
-        }
+    //     body.AddForce(0.5f * accel * idleDir, ForceMode2D.Force);
+    //     if (body.linearVelocity.magnitude > moveSpeed)
+    //     {
+    //         body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
+    //     }
 
-        // Debug.Log("Idle: " + idleTimer.ToString());
-    }
+    //     // Debug.Log("Idle: " + idleTimer.ToString());
+    // }
 
     // if player is >2 units away, pathfind to player
-    void TooFar()
-    {
-        body.AddForce(direction * accel, ForceMode2D.Force);
-        if (body.linearVelocity.magnitude > moveSpeed)
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
-        }
-        circleDirection = Random.value > 0.5f ? 1f : -1f; // if greater than 0.5, 1 (CW), else -1 (CCW)
+    // void TooFar()
+    // {
+    //     body.AddForce(direction * accel, ForceMode2D.Force);
+    //     if (body.linearVelocity.magnitude > moveSpeed)
+    //     {
+    //         body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
+    //     }
+    //     circleDirection = Random.value > 0.5f ? 1f : -1f; // if greater than 0.5, 1 (CW), else -1 (CCW)
 
-        // Debug.Log("Too far: " + distance.ToString());
-    }
+    //     // Debug.Log("Too far: " + distance.ToString());
+    // }
 
     // if player is <1 unit away, retreat slightly
-    void TooClose()
-    {
-        body.AddForce(-direction * accel, ForceMode2D.Force);
-        if (body.linearVelocity.magnitude > moveSpeed)
-        {
-            body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
-        }
-        circleDirection = Random.value > 0.5f ? 1f : -1f; // if greater than 0.5, 1 (CW), else -1 (CCW)
+    // void TooClose()
+    // {
+    //     body.AddForce(-direction * accel, ForceMode2D.Force);
+    //     if (body.linearVelocity.magnitude > moveSpeed)
+    //     {
+    //         body.linearVelocity = Vector2.Lerp(body.linearVelocity, Vector2.zero, Time.fixedDeltaTime * damping);
+    //     }
+    //     circleDirection = Random.value > 0.5f ? 1f : -1f; // if greater than 0.5, 1 (CW), else -1 (CCW)
 
-        // Debug.Log("Too close: " + distance.ToString());
-    }
+    //     // Debug.Log("Too close: " + distance.ToString());
+    // }
 
     // if player is 1-2 units away, circle with a chance to attack
-    void Circle()
+    protected override void Circle(float mult)
     {
         Vector2 perp = Vector2.Perpendicular(direction) * circleDirection;
 
@@ -314,7 +315,7 @@ public class enemy1_control : MonoBehaviour
     
     /* ACTION FUNCTIONS */
     // Attack (ram the player)
-    void Attack()
+    protected override void Attack()
     {
         // if player moves out of range, clean up
         if (distance > attackRange && foreswingTimer > aimLockTime) 
@@ -439,7 +440,7 @@ public class enemy1_control : MonoBehaviour
     }
 
     // if just attacked or got parried, lerp to zero ("stun")
-    void Retreat()
+    protected override void Retreat()
     {
         // body.AddForce(-direction * accel * 0.5f, ForceMode2D.Force);
         // if (body.linearVelocity.magnitude > moveSpeed)
@@ -478,7 +479,7 @@ public class enemy1_control : MonoBehaviour
     {
         // variable cleanup
         // "stun" enemy and set to scared
-        body.linearVelocity = new Vector2(0f, 0f);
+        // body.linearVelocity = new Vector2(0f, 0f);
         StopAllCoroutines();
         parryWindow.isParryable = false;
         state = EnemyState.Retreating; 

@@ -234,11 +234,20 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
         - Wanted it as a "watching the player" state, cancelled upon player getting to close
 - [ ] Extract from enemy1 controller code a "base enemy" class for reusability
     - [ ] Stats?
-    - [ ] Behaviour (state machine)?
+    - [x] Added base behaviour to BaseEnemy
         - [x] Moved Idle, TooFar, TooClose to BaseEnemy
-        - [ ] Add Circling (melee enemies only) and Aiming (ranged enemies only)
+        - [x] Add Circling (melee enemies only) 
+        - [ ] Add Aiming (ranged enemies only)
             - Maybe make Aiming part of attack foreswing?
-    - [ ] Switch enemy1 over to BaseEnemy
+        - [x] Move a basic state machine to BaseEnemy (includes Idle, TooFar, TooClose)?
+            - TEST IF WORKING I BET IT ISNT LOL
+            - It sort of works...
+    - [x] Switch enemy1 over to BaseEnemy
+        - [x] Test if it works lol (wtf it does wow first try lol)
+
+- While not yet fully functional, this is saving an incredible amount of code.
+- NEXT: restore behaviour. One problem seems to be that enemies now Circle when they should be TooFar. 
+    
 
 </details>
 
