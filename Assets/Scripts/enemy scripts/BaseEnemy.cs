@@ -39,10 +39,12 @@ public abstract class BaseEnemy : MonoBehaviour
     protected float cooldownTimer = 0;
     
     /* METHODS */
-    protected bool PlayerTooFar => distance > 5f;
-    protected bool PlayerTooClose => distance < 1f;
-    protected bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
-    protected bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
+    protected float tooFar = 3f;
+    protected float tooClose = 1f;
+    protected virtual bool PlayerTooFar => distance > tooFar;
+    protected virtual bool PlayerTooClose => distance < tooClose;
+    protected virtual bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
+    protected virtual bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
     
     /* OTHER STUFF */
     protected Rigidbody2D body;             // enemy rigidbody

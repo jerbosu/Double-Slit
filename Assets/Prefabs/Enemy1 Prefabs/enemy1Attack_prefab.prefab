@@ -83,7 +83,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Hitbox
   damage: 20
-  knockbackForce: 20
+  knockbackForce: 10
   healOnHit: 0
   isParryAttack: 0
   attackerHurtbox: {fileID: 0}

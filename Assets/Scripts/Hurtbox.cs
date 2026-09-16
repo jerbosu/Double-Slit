@@ -15,6 +15,7 @@ public class Hurtbox : MonoBehaviour
 
     // misc
     public System.Action onDeath;   // event that other scripts can listen to
+    public System.Action onHit;     // another event
 
     private Rigidbody2D parent;     // for applying knockback
 
@@ -40,6 +41,7 @@ public class Hurtbox : MonoBehaviour
     public void TakeDamage(float amount, Vector2 knockback)
     {
         health -= amount;
+        onHit?.Invoke();
         parent.AddForce(knockback, ForceMode2D.Impulse);
 
         if (flashOverlay != null) { StartCoroutine(Flash()); }

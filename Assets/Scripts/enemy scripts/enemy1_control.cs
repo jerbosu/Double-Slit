@@ -55,7 +55,7 @@ public class enemy1_control : BaseEnemy
     // private Vector2 direction;
     // private float activationRange = 5f;
     // private bool initialContact = true;
-    // private bool PlayerTooFar => distance > attackRange * 0.9f;
+    protected override bool PlayerTooFar => distance > attackRange * 0.9f;
     // private bool PlayerTooClose => distance < 1f;
     // private bool PlayerInRange => !PlayerTooFar && !PlayerTooClose;
     // private bool ReadyToAttack => circleTimer <= 0 && cooldownTimer <= 0;
@@ -543,14 +543,9 @@ public class enemy1_control : BaseEnemy
         }
 
         // death particle effect here
-        Destroy(gameObject, 0.5f);
+        CameraFollow.Instance.Shake(4f, 0.1f);
+        Destroy(gameObject, 0.1f);
         // StartCoroutine(died());
-    }
-
-    IEnumerator died()
-    {
-        yield return new WaitForSeconds(0.5f);
-        Destroy(gameObject);
     }
 
 }
