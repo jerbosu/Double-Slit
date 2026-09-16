@@ -14,9 +14,9 @@ public class ScreenFlash : MonoBehaviour
     }
 
     // to be called by other classes
-    public void Flash(Color color, float duration)
+    public void Flash(Color color, float duration, bool fade)
     {
-        StartCoroutine(DoFlash(color, duration));
+        StartCoroutine(DoFlash(color, duration, fade));
     }
 
     /// <summary>
@@ -25,7 +25,7 @@ public class ScreenFlash : MonoBehaviour
     /// <param name="color">RGBA 0-1</param>
     /// <param name="duration">Duration in seconds</param>
     /// <returns></returns>
-    IEnumerator DoFlash(Color color, float duration)
+    IEnumerator DoFlash(Color color, float duration, bool fade)
     {
         float setAlpha = color.a;
         image.color = color;
@@ -33,14 +33,17 @@ public class ScreenFlash : MonoBehaviour
         yield return new WaitForSecondsRealtime(duration);
 
         // lerp flash to transparent
-        // float elapsed = 0f;
-        // while (elapsed < duration)
-        // {
-        //     elapsed += Time.unscaledDeltaTime;
-        //     color.a = Mathf.Lerp(setAlpha, 0f, elapsed / duration);
-        //     image.color = color;
-        //     yield return null;
-        // }
+        if (fade == true)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                color.a = Mathf.Lerp(setAlpha, 0f, elapsed / duration);
+                image.color = color;
+                yield return null;
+            }
+        }
 
         color.a = 0f;
         image.color = color;

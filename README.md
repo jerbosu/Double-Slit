@@ -221,7 +221,19 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
     <summary>Misc</summary>
 
 - [x] Fixed enemy1 telegraph behaviour
-- [ ] Telegraph still sometimes finishes playing even if enemy dies, fix
+- [x] Telegraph still sometimes finishes playing even if enemy dies, fix
+- [x] Create a new branch to experiment with branches and merging. 
+
+- [x] Add effects for when enemy hits the player
+    - [x] Screenflash red
+        - Added parameter to screenflash on whether to fade flash away or immediately remove it
+    - [x] More knockback
+        - [x] Fix knockback not correctly applying to player
+- [ ] Add enemy1 death effect
+
+- [x] Screenshake effect
+    - Triggered on parry, on enemydeath. Maybe add on damage taken by player
+    - Maybe this is overusing it?
 - [x] Edit to main branch, separate from BaseEnemy branch. For experimenting with merge conflict resolution.  
 
 </details>
@@ -232,13 +244,19 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
 - [ ] Clean up enemy1 code
     - [ ] Idle state seems slightly redundant/not serving its intended purpose
         - Wanted it as a "watching the player" state, cancelled upon player getting to close
-- [ ] Extract from enemy1 controller code a "base enemy" class for reusability
-    - [ ] Stats?
-    - [ ] Behaviour (state machine)?
+- [x] Extract from enemy1 controller code a "base enemy" class for reusability
+    - [x] Enemy Stats (health, movespeed, etc) are customizable per enemy
+    - [x] Added base behaviour to BaseEnemy
         - [x] Moved Idle, TooFar, TooClose to BaseEnemy
-        - [ ] Add Circling (melee enemies only) and Aiming (ranged enemies only)
+        - [x] Add Circling (melee enemies only) 
+        - [ ] Add Aiming (ranged enemies only)
             - Maybe make Aiming part of attack foreswing?
-    - [ ] Switch enemy1 over to BaseEnemy
+        - [x] Move a basic state machine to BaseEnemy (includes Idle, TooFar, TooClose)?
+            - TEST IF WORKING I BET IT ISNT LOL
+            - It sort of works...
+    - [x] Switch enemy1 over to BaseEnemy
+        - [x] Test if it works lol (wtf it does wow first try lol)
+    
 
 </details>
 
@@ -247,7 +265,7 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
 
 - Will be a ranged enemy
 - [ ] Enemy2 visuals
-    - [ ] Sprite
+    - [x] Sprite
     - [ ] Projectile
 
 </details>

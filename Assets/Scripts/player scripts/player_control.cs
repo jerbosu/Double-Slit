@@ -84,6 +84,8 @@ public class character_movement : MonoBehaviour
         heavyAttackIndicator = transform.Find("heavyAttackIndicator").GetComponent<ParticleSystem>();
 
         GetComponent<Parryable>().onParried += OnParried;
+        GetComponentInChildren<Hurtbox>().onHit += () => 
+            ScreenFlash.Instance.Flash(new Color(1f, 0f, 0f, 0.1f), 0.05f, true);
     }
 
     // Event-driven stuff (i.e. left click for attack)

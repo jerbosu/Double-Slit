@@ -10,15 +10,17 @@ public class Parryable : MonoBehaviour
     {
         if (isParryable)
             onParried?.Invoke();
-            ScreenFlash.Instance.Flash(new Color(1f, 1f, 1f, 0.1f), 0.5f);
+            ScreenFlash.Instance.Flash(new Color(1f, 1f, 1f, 0.1f), 0.5f, false);
             StartCoroutine(ParryHitstop());
     }
 
     IEnumerator ParryHitstop()
     {
+        // CameraFollow.Instance.Shake(2f, 0.2f);
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(0.5f);
         Time.timeScale = 1f;
+        CameraFollow.Instance.Shake(2f, 0.2f);
     }
 
 }
