@@ -67,7 +67,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 
 <details>
-<summary>Gameplay preparation</summary>
+    <summary>Gameplay preparation</summary>
 
 - [x] Bounding arena box
 - [x] Change cooldowns and particle systems to use unscaledTime in preparation for hitstop implementation
@@ -76,17 +76,6 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 </details>
 
 ### Week 3 (Aug 16-22)
-<details>
-    <summary>Misc</summary>
-
-- [x] Reorganize scripts folder (will probably do the same with other asset folders in the future)
-- [x] Separate the squash/stretch code from the player so that it can be used for separate gameobjects
-    - Created a new squash/stretch script, which can be attached to the visual of anything that needs it
-- [x] Have heavy attack inherit the velocity of the player
-- [ ] Possibly change heavy attack to a single object that fades away rather than a sprite animation?
-
-</details>
-
 <details> 
     <summary>First enemy</summary>
 
@@ -109,20 +98,18 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
     - It's still spaghetti but it's more readable
 </details>
 
-### Week 4 (Aug 23 - 29)
 <details>
     <summary>Misc</summary>
 
-- [x] Refactor state machine code to make it more readable again. 
-    - Turns out AI is really good at making your code look nice. It's not the best at making functional code though. Or at least the free model isn't. 
-- [x] Disable player hitbox while dashing (i.e. can move through enemies and attacks, but not through walls)
-- [x] Add player healthbar display
-- [ ] Player heavy attack hitbox animation over time
-    - As the heavy attack is a shockwave that moves forward, the hitbox must be animated accordingly
-- [x] Created a general Hurtbox and Hitbox script to use in all attacks
+- [x] Reorganize scripts folder (will probably do the same with other asset folders in the future)
+- [x] Separate the squash/stretch code from the player so that it can be used for separate gameobjects
+    - Created a new squash/stretch script, which can be attached to the visual of anything that needs it
+- [x] Have heavy attack inherit the velocity of the player
+- [ ] Possibly change heavy attack to a single object that fades away rather than a sprite animation?
 
 </details>
 
+### Week 4 (Aug 23 - 29)
 <details>
     <summary>Finishing up enemy 1 visuals and behaviour</summary>
 
@@ -150,30 +137,22 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
         - Current knockback is based on player and enemy position, not attack direction
     - [ ] Particle effect on death (direction, velocity...)
 
+</details>
+
+<details>
+    <summary>Misc</summary>
+
+- [x] Refactor state machine code to make it more readable again. 
+    - Turns out AI is really good at making your code look nice. It's not the best at making functional code though. Or at least the free model isn't. 
+- [x] Disable player hitbox while dashing (i.e. can move through enemies and attacks, but not through walls)
+- [x] Add player healthbar display
+- [ ] Player heavy attack hitbox animation over time
+    - As the heavy attack is a shockwave that moves forward, the hitbox must be animated accordingly
+- [x] Created a general Hurtbox and Hitbox script to use in all attacks
 
 </details>
 
 ### Week 5 (Aug 30 - Sept 5)
-Note that the current version has a bug with the way enemy1 attempts to predict the player movement when launching an attack. 
-<details>
-    <summary>Misc</summary>
-
-- [x] On hit effects
-    - [x] Particles on hit (speed scales with damage)
-    - [x] Flash on hit
-- [x] Animate heavy attack hitbox
-    - [ ] Either increase accuracy of the animation or change heavy attack to match the animation
-- [x] Hurtbox/collider correction
-    - Capsule colliders can only extend along one axis. Matched that axis with the squash/stretch axis for the two gameobjects currently using them. 
-- [x] Hitbox correction
-    - Sometimes the knockback from an attack could cause an enemy to enter, exit, then enter the attack hitbox again, dealing multiple instances of knockback and damage
-    - Fixed by storing and checking if an entity has already been hit by an attack instance
-- [ ] Have UI show on top of gameobjects
-- [x] Change enemy1 attack range to be distance based rather than time based. Very silly error.
-    - Telegraph prefab and hitbox are now also distance rather than time based.
-
-</details>
-
 <details>
     <summary>Enemy 1 interactions</summary>
 
@@ -215,35 +194,35 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
 
 </details>
 
-### Week 6 (Sept 6 - 12)
-
 <details>
     <summary>Misc</summary>
 
-- [x] Fixed enemy1 telegraph behaviour
-- [x] Telegraph still sometimes finishes playing even if enemy dies, fix
-- [x] Create a new branch to experiment with branches and merging. 
-
-- [x] Add effects for when enemy hits the player
-    - [x] Screenflash red
-        - Added parameter to screenflash on whether to fade flash away or immediately remove it
-    - [x] More knockback
-        - [x] Fix knockback not correctly applying to player
-- [ ] Add enemy1 death effect
-
-- [x] Screenshake effect
-    - Triggered on parry, on enemydeath. Maybe add on damage taken by player
-    - Maybe this is overusing it?
-- [x] Edit to main branch, separate from BaseEnemy branch. For experimenting with merge conflict resolution.  
+- [x] On hit effects
+    - [x] Particles on hit (speed scales with damage)
+    - [x] Flash on hit
+- [x] Animate heavy attack hitbox
+    - [ ] Either increase accuracy of the animation or change heavy attack to match the animation
+- [x] Hurtbox/collider correction
+    - Capsule colliders can only extend along one axis. Matched that axis with the squash/stretch axis for the two gameobjects currently using them. 
+- [x] Hitbox correction
+    - Sometimes the knockback from an attack could cause an enemy to enter, exit, then enter the attack hitbox again, dealing multiple instances of knockback and damage
+    - Fixed by storing and checking if an entity has already been hit by an attack instance
+- [ ] Have UI show on top of gameobjects
+- [x] Change enemy1 attack range to be distance based rather than time based. Very silly error.
+    - Telegraph prefab and hitbox are now also distance rather than time based.
 
 </details>
+
+### Week 6 and 7 (Sept 6 - 19)
 
 <details>
     <summary>Major Code Refactor</summary>
 
-- [ ] Clean up enemy1 code
+- [x] Clean up enemy1 code
     - [ ] Idle state seems slightly redundant/not serving its intended purpose
         - Wanted it as a "watching the player" state, cancelled upon player getting to close
+        - On second thought it functions quite well as a base state
+
 - [x] Extract from enemy1 controller code a "base enemy" class for reusability
     - [x] Enemy Stats (health, movespeed, etc) are customizable per enemy
     - [x] Added base behaviour to BaseEnemy
@@ -252,13 +231,58 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
         - [ ] Add Aiming (ranged enemies only)
             - Maybe make Aiming part of attack foreswing?
         - [x] Move a basic state machine to BaseEnemy (includes Idle, TooFar, TooClose)?
-            - TEST IF WORKING I BET IT ISNT LOL
+            - TEST IF WORKING IT PROBABLY DOESNT
             - It sort of works...
+
     - [x] Switch enemy1 over to BaseEnemy
-        - [x] Test if it works lol (wtf it does wow first try lol)
+        - [x] Test if it works 
+            - it does wow first try
     
+    - [x] Move Die() method to BaseEnemy
+        - [x] Fix particle effect not playing
+            - alpha was set to zero... 30 minutes wasted
 
 </details>
+
+<details>
+    <summary>Visuals</summary>
+
+- [x] Added effects for when enemy hits the player
+    - [x] Screenflash red
+        - Added parameter to screenflash on whether to fade flash away or immediately remove it
+        - Reuses the same screeflash class as parry. BaseEnemy will surely save me a lot of time in the future.
+    - [x] More knockback
+        - [x] Fix knockback not correctly applying to player
+- [x] Add enemy1 death effect
+    - Particle explosion on death, speed scales with damage of last hit
+    - [x] Fix particle explosion direction
+        - Forgot to convert from rad to deg again...
+
+- [x] Screenshake effect to add more impact
+    - Triggered on parry, on enemydeath. Maybe add on damage taken by player
+    - Maybe this is overusing it?
+
+</details>
+
+<details>
+    <summary>Misc</summary>
+
+- [x] Fixed enemy1 telegraph behaviour
+- [x] Telegraph still sometimes finishes playing even if enemy dies, fix
+    - Stop coroutine, telegraph = null doesnt seem to fix it.
+    - Fixed by destroying the enemy immediately upon death instead
+
+- [x] Create a new branch to experiment with branches and merging. 
+- [x] Made conflicting edits to README of both branches; testing with merge conflict resolution.
+
+- [x] Reordered README changes to have major changes first, then minor ones, then misc edits.
+
+</details>
+
+
+
+
+### Week 8 (Sept 20 - 26)
 
 <details>
     <summary>Enemy 2</summary>
@@ -269,3 +293,12 @@ Note that the current version has a bug with the way enemy1 attempts to predict 
     - [ ] Projectile
 
 </details>
+
+<details>
+    <summary>Misc</summary>
+
+- [ ] If the enemy is knocked back while attacking the telegraph prediction bugs out, fix
+    - Probably because the prediction is based on player velocity relative to the enemy
+
+</details>
+

@@ -2,6 +2,11 @@ using UnityEngine;
 
 public abstract class BaseEnemy : MonoBehaviour
 {
+    /* GAMEOBJECTS */
+    [Header("GameObjects")]
+    [SerializeField] protected GameObject deathParticlePrefab;
+    [SerializeField] protected Color enemyColor;
+
     /* STATS */
     [Header("Stats")]
     [SerializeField] protected float health = 10f;
@@ -346,5 +351,29 @@ public abstract class BaseEnemy : MonoBehaviour
         scaredTimer -= Time.deltaTime;
 
         // Debug.Log("Retreating: " + scaredTimer.ToString());
+    }
+
+
+
+    protected virtual void Die(float damage)
+    {
+        // death particle effect here
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 180f;
+
+        GameObject deathParticles = Instantiate(deathParticlePrefab, transform.position, Quaternion.identity);
+        ParticleSystem ps = deathParticles.GetComponent<ParticleSystem>();
+        
+        deathParticles.transform.rotation = Quaternion.Euler(0f, 0f, angle - ps.shape.arc / 2);
+
+        var main = ps.main;
+        main.startSpeed = new ParticleSystem.MinMaxCurve(damage * 1f, damage * 2f);
+        main.startColor = enemyColor;
+        ps.Emit(12);
+
+        Destroy(deathParticles, 1f);
+
+        // death handling
+        CameraFollow.Instance.Shake(4f, 0.1f);
+        Destroy(gameObject, 0.01f);
     }
 }

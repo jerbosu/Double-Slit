@@ -15,6 +15,8 @@ public class Hurtbox : MonoBehaviour
 
     // misc
     public System.Action onDeath;   // event that other scripts can listen to
+    public System.Action<float> onDeathWithInfo;
+    private float lastHitDamage;
     public System.Action onHit;     // another event
 
     private Rigidbody2D parent;     // for applying knockback
@@ -40,6 +42,7 @@ public class Hurtbox : MonoBehaviour
 
     public void TakeDamage(float amount, Vector2 knockback)
     {
+        lastHitDamage = amount;
         health -= amount;
         onHit?.Invoke();
         parent.AddForce(knockback, ForceMode2D.Impulse);
@@ -61,10 +64,11 @@ public class Hurtbox : MonoBehaviour
             hitParticles.Emit(5);
         }
 
-        Debug.Log(gameObject.name + " health: " + health);
+        // Debug.Log(gameObject.name + " health: " + health);
         if (health <= 0)
         {
             onDeath?.Invoke();
+            onDeathWithInfo?.Invoke(lastHitDamage);
             health = 0;
         }
     }

@@ -24,7 +24,7 @@ public class enemy2_control : BaseEnemy
     protected override void FixedUpdate()
     {
         base.FixedUpdate();
-        Debug.Log("Enemy2 State: " + state);
+        // Debug.Log("Enemy2 State: " + state);
     }
 
 
