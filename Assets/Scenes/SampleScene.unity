@@ -10731,7 +10731,7 @@ GameObject:
   - component: {fileID: 674080810}
   m_Layer: 9
   m_Name: ArenaSquare
-  m_TagString: Untagged
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -11552,6 +11552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a09a6e56c2c5f644a7e55ce5b4645f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  deathParticlePrefab: {fileID: 0}
+  enemyColor: {r: 0.8745099, g: 0.2392157, b: 0.35686275, a: 1}
   health: 10
   moveSpeed: 5
   accel: 10
@@ -11565,6 +11567,7 @@ MonoBehaviour:
   attackForeswing: 0.7
   attackBackswing: 0.5
   attackRange: 2.5
+  projectile_prefab: {fileID: 4655659684154602950, guid: 641ab754348b35542a6ff68947305e15, type: 3}
 --- !u!58 &1241958715
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -11860,13 +11863,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1566830251}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 900fbdaf7c79d79468aadab434ce4589, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
   enemyPrefab: {fileID: 1690014294739859373, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-  spawnInterval: 3
+  spawnInterval: 0
   spawnRadius: 1
 --- !u!4 &1566830253
 Transform:
@@ -12113,67 +12116,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1001 &1770541278
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.93302
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.80441
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 255575213659624782, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1690014294739859373, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_Name
-      value: enemy1_0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3602279469959621247, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
-      propertyPath: m_Name
-      value: enemy1Hurtbox
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: cc7b0e451189ea247bbd92bcb5064d7f, type: 3}
 --- !u!1 &1808745834
 GameObject:
   m_ObjectHideFlags: 0
@@ -12362,4 +12304,3 @@ SceneRoots:
   - {fileID: 680623257}
   - {fileID: 1566830253}
   - {fileID: 1241958711}
-  - {fileID: 1770541278}

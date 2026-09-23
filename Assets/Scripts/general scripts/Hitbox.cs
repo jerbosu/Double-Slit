@@ -41,9 +41,15 @@ public class Hitbox : MonoBehaviour
     // Unity auto calls this when colliders collide (wow)
     void OnTriggerEnter2D(Collider2D other)
     {
+        
         Hurtbox hurtbox = other.GetComponent<Hurtbox>();    // get the hurtbox of the colliding gameobject
+        
         if (hurtbox == null) return;                        // error handling idk
+        
+
         if (alreadyHit.Contains(hurtbox)) return;           // this hitbox instance has already hit this target
+        
+
         alreadyHit.Add(hurtbox);                            // else, add to hit targets
         float tempDamage = damage;
 

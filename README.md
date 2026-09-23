@@ -283,6 +283,7 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 
 
 ### Week 8 (Sept 20 - 26)
+50 days in a row!
 
 <details>
     <summary>Enemy 2</summary>
@@ -290,7 +291,16 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 - Will be a ranged enemy
 - [ ] Enemy2 visuals
     - [x] Sprite
-    - [ ] Projectile
+    - [x] Projectile
+
+- [x] Made Projectile into its own class for reusability
+
+- [ ] Enemy2 attack code
+    - [ ] Telegraph line
+    - [x] Projectile instantiate
+    - [x] Projectile destroy on contact with player, another enemy, the wall
+    - [ ] Projectile custom interaction when hitting enemy, player
+    - [ ] Projectile redirect by player attack
 
 </details>
 
@@ -299,6 +309,9 @@ A 2D top down action game built in Unity. My first game coding project. Inspired
 
 - [ ] If the enemy is knocked back while attacking the telegraph prediction bugs out, fix
     - Probably because the prediction is based on player velocity relative to the enemy
+- [ ] Fix telegraph prediction in general
+    - Not perfectly synced with attack, bugs out in situations where player is moving directly towards enemy, etc
+- [x] More file reorganization
 
 </details>
 
